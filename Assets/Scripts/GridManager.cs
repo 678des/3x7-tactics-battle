@@ -52,6 +52,12 @@ public class GridManager : MonoBehaviour
                 GameObject cellObj = Instantiate(cellPrefab, new Vector3(c, 0, r), Quaternion.identity);
                 cellObj.name = "Cell_" + c + "_" + r;
                 cellObj.transform.SetParent(this.transform);
+
+                GridCell gridCell = cellObj.GetComponent<GridCell>();
+                if (gridCell != null)
+                {
+                    gridCell.GridPosition = new Vector2Int(c, r);
+                }
             }
         }
     }

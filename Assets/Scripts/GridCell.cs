@@ -2,6 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// グリッド上の各セル（マス）にアタッチされ、自身の座標情報を保持するコンポーネント。
+/// GridCellのプレハブにアタッチしてください。
 /// </summary>
 [RequireComponent(typeof(Collider))] 
 public class GridCell : MonoBehaviour
