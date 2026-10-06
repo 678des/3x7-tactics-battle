@@ -1,6 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+public enum TeamType
+{
+    Player,
+    Enemy
+}
+
 /// <summary>
 /// 3x7のグリッド管理クラス。
 /// マスのデータ保持、キャラクターの配置管理、移動判定を行う。
@@ -107,6 +113,11 @@ public class GridManager : MonoBehaviour
         return availableMoves;
     }
 
+    public List<Vector2Int> GetReachableTiles(Unit unit, Vector2Int currentPos)
+    {
+        return GetAvailableMoves(unit, currentPos.x, currentPos.y);
+    }
+
     public bool IsValidMove(Vector2Int targetPos)
     {
         if (SelectedUnit == null) return false;
@@ -161,6 +172,69 @@ public class GridManager : MonoBehaviour
             }
         }
         return list;
+    }
+
+    public List<Unit> GetAllUnitsByTeam(TeamType team)
+    {
+        List<Unit> list = new List<Unit>();
+        bool targetIsPlayer = (team == TeamType.Player);
+        foreach (var unit in GetAllUnits())
+        {
+            if (unit.IsPlayerOwned == targetIsPlayer)
+            {
+                list.Add(unit);
+            }
+        }
+        return list;
+    }
+
+    public Vector2Int GetUnitPosition(Unit unit)
+    {
+        for (int c = 0; c < Cols; c++)
+        {
+            for (int r = 0; r < Rows; r++)
+            {
+                if (_grid[c, r] == unit)
+                {
+                    return new Vector2Int(c, r);
+                }
+            }
+        }
+        return new Vector2Int(-1, -1);
+    }
+
+    public List<Vector2Int> GetAllUnitPositionsByTeam(TeamType team)
+    {
+        List<Vector2Int> list = new List<Vector2Int>();
+        bool targetIsPlayer = (team == TeamType.Player);
+        for (int c = 0; c < Cols; c++)
+        {
+            for (int r = 0; r < Rows; r++)
+            {
+                if (_grid[c, r] != null && _grid[c, r].IsPlayerOwned == targetIsPlayer)
+                {
+                    list.Add(new Vector2Int(c, r));
+                }
+            }
+        }
+        return list;
+    }
+
+    public void ProcessAllUnitMovements()
+    {
+        foreach (var kvp in _reservedMoves)
+        {
+            Unit unit = kvp.Key;
+            Vector2Int targetPos = kvp.Value;
+            Vector2Int currentPos = GetUnitPosition(unit);
+
+            if (IsValidCoordinate(currentPos.x, currentPos.y) && IsValidCoordinate(targetPos.x, targetPos.y))
+            {
+                _grid[currentPos.x, currentPos.y] = null;
+                _grid[targetPos.x, targetPos.y] = unit;
+            }
+        }
+        _reservedMoves.Clear();
     }
 
     public void SetCellObstacle(Vector2Int pos, bool isObstacle)

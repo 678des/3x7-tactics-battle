@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
     private void ExecuteMovement()
     {
         // 1. 敵AIの移動予約を確定させる
-        enemyAI.DecideMoves();
+        enemyAI.ExecuteEnemyTurn();
 
         // 2. GridManagerを通じて全ユニットを移動させる
         gridManager.ProcessAllUnitMovements();

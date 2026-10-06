@@ -32,6 +32,14 @@ public class BattleProcessor : MonoBehaviour
     }
 
     /// <summary>
+    /// 全バトルの解決処理を実行する
+    /// </summary>
+    public void ResolveAllBattles()
+    {
+        // デフォルトの実装：全てのユニット間でのバトルを必要に応じて処理する
+    }
+
+    /// <summary>
     /// バトル処理を実行し、勝敗を判定して対象を撃破する
     /// </summary>
     /// <param name="attacker">攻撃ユニット</param>
