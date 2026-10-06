@@ -20,6 +20,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private BattleProcessor battleProcessor;
     [SerializeField] private EnemyAI enemyAI;
 
+    [Header("Initial Setup")]
+    [SerializeField] private System.Collections.Generic.List<GameObject> playerStartingCards;
+    [SerializeField] private System.Collections.Generic.List<GameObject> enemyStartingCards;
+
     public static GamePhase CurrentPhase { get; private set; }
 
     private void Awake()
@@ -32,7 +36,26 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        DistributeStartingCards();
         StartPhase(GamePhase.Spawn);
+    }
+
+    /// <summary>
+    /// ゲームスタート時にプレイヤーと敵の陣地に手持ちのカードを均等に配置する
+    /// </summary>
+    private void DistributeStartingCards()
+    {
+        if (gridManager != null)
+        {
+            if (playerStartingCards != null && playerStartingCards.Count > 0)
+            {
+                gridManager.SpawnCardsForTeam(playerStartingCards, TeamType.Player);
+            }
+            if (enemyStartingCards != null && enemyStartingCards.Count > 0)
+            {
+                gridManager.SpawnCardsForTeam(enemyStartingCards, TeamType.Enemy);
+            }
+        }
     }
 
     /// <summary>
