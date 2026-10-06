@@ -4,6 +4,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+
 [RequireComponent(typeof(Canvas))]
 public class UIManager : MonoBehaviour
 {
