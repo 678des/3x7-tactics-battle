@@ -1,3 +1,6 @@
+// Responsibility: Mobile touch and mouse input detection for triggering gameplay actions (move reservations, card usage).
+// Attachment Note: Attach to a persistent GameObject or GameManager GameObject in the scene.
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 

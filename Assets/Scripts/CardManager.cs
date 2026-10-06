@@ -1,3 +1,6 @@
+// Responsibility: Hand management, cost consumption, and card effect application.
+// Attachment Note: Attach to a GameManager or CardManager GameObject in the scene.
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -8,7 +11,6 @@ using System.Collections.Generic;
 public class CardManager : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private int maxHandSize = 5;
     [SerializeField] private int currentCost = 3;
     [SerializeField] private int maxCost = 3;
 
