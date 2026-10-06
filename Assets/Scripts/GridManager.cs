@@ -9,7 +9,8 @@ public enum TeamType
 
 /// <summary>
 /// 3x7のグリッド管理クラス。
-/// マスのデータ保持、キャラクターの配置管理、移動判定を行う。
+/// マスのデータ保持、キャラクターの配置管理、移動判定、およびCubeによる初期マス生成を行う。
+/// このスクリプトは、グリッドの原点となる空のGameObjectにアタッチしてください。
 /// </summary>
 [RequireComponent(typeof(UnityEngine.Transform))]
 public class GridManager : MonoBehaviour
@@ -23,6 +24,29 @@ public class GridManager : MonoBehaviour
     public Unit SelectedUnit { get; private set; }
     private Vector2Int _selectedUnitPos;
     private Dictionary<Unit, Vector2Int> _reservedMoves = new Dictionary<Unit, Vector2Int>();
+
+    private void Start()
+    {
+        GenerateGridCubes();
+    }
+
+    /// <summary>
+    /// 3x7のマスを一つ一つCubeで生成する初期関数
+    /// </summary>
+    private void GenerateGridCubes()
+    {
+        for (int c = 0; c < Cols; c++)
+        {
+            for (int r = 0; r < Rows; r++)
+            {
+                GameObject cellCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cellCube.name = "Cell_" + c + "_" + r;
+                cellCube.transform.position = new Vector3(c, 0, r);
+                cellCube.transform.localScale = new Vector3(0.95f, 0.1f, 0.95f);
+                cellCube.transform.SetParent(this.transform);
+            }
+        }
+    }
 
     public bool CanPlaceUnit(int col, int row)
     {
