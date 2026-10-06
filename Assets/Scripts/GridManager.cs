@@ -5,26 +5,47 @@ using System.Collections.Generic;
 /// 3x7のグリッド管理クラス。
 /// マスのデータ保持、キャラクターの配置管理、移動判定を行う。
 /// </summary>
+[RequireComponent(typeof(UnityEngine.Transform))]
 public class GridManager : MonoBehaviour
 {
     private const int Rows = 7;
     private const int Cols = 3;
 
-    // グリッド上のユニット配置データ
     private Unit[,] _grid = new Unit[Cols, Rows];
+    private bool[,] _obstacles = new bool[Cols, Rows];
 
-    /// <summary>
-    /// 指定した座標にユニットを配置できるか確認する
-    /// </summary>
+    public Unit SelectedUnit { get; private set; }
+    private Vector2Int _selectedUnitPos;
+    private Dictionary<Unit, Vector2Int> _reservedMoves = new Dictionary<Unit, Vector2Int>();
+
     public bool CanPlaceUnit(int col, int row)
     {
         if (!IsValidCoordinate(col, row)) return false;
-        return _grid[col, row] == null;
+        return _grid[col, row] == null && !_obstacles[col, row];
     }
 
-    /// <summary>
-    /// ユニットをグリッドに配置する
-    /// </summary>
+    public bool IsCellOccupied(Vector2Int pos)
+    {
+        if (!IsValidCoordinate(pos.x, pos.y)) return true;
+        return _grid[pos.x, pos.y] != null || _obstacles[pos.x, pos.y];
+    }
+
+    public void SpawnUnit(GameObject unitPrefab, Vector2Int pos)
+    {
+        if (!IsValidCoordinate(pos.x, pos.y)) return;
+        if (IsCellOccupied(pos)) return;
+
+        if (unitPrefab != null)
+        {
+            GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), Quaternion.identity);
+            Unit unit = obj.GetComponent<Unit>();
+            if (unit != null)
+            {
+                _grid[pos.x, pos.y] = unit;
+            }
+        }
+    }
+
     public void PlaceUnit(Unit unit, int col, int row)
     {
         if (IsValidCoordinate(col, row))
@@ -33,9 +54,6 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ユニットの配置を解除する
-    /// </summary>
     public void RemoveUnit(int col, int row)
     {
         if (IsValidCoordinate(col, row))
@@ -44,20 +62,19 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 指定座標のユニットを取得する
-    /// </summary>
     public Unit GetUnitAt(int col, int row)
     {
         return IsValidCoordinate(col, row) ? _grid[col, row] : null;
     }
 
-    /// <summary>
-    /// ユニットの移動処理（配置データの更新）
-    /// </summary>
+    public Unit GetUnitAt(Vector2Int pos)
+    {
+        return GetUnitAt(pos.x, pos.y);
+    }
+
     public bool TryMoveUnit(int fromCol, int fromRow, int toCol, int toRow)
     {
-        if (!IsValidCoordinate(toCol, toRow) || _grid[toCol, toRow] != null)
+        if (!IsValidCoordinate(toCol, toRow) || _grid[toCol, toRow] != null || _obstacles[toCol, toRow])
             return false;
 
         Unit unit = _grid[fromCol, fromRow];
@@ -66,34 +83,22 @@ public class GridManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// 座標がグリッド内か判定
-    /// </summary>
     public bool IsValidCoordinate(int col, int row)
     {
         return col >= 0 && col < Cols && row >= 0 && row < Rows;
     }
 
-    /// <summary>
-    /// 指定されたユニットの移動可能範囲を計算する
-    /// </summary>
-    /// <param name="unit">対象ユニット</param>
-    /// <param name="currentCol">現在の列</param>
-    /// <param name="currentRow">現在の行</param>
-    /// <returns>移動可能な座標リスト</returns>
     public List<Vector2Int> GetAvailableMoves(Unit unit, int currentCol, int currentRow)
     {
         List<Vector2Int> availableMoves = new List<Vector2Int>();
-        
-        // ユニットの移動範囲定義（Unitクラスから取得する想定）
-        var movePattern = unit.MovePattern; 
+        var movePattern = unit.MovePattern;
 
         foreach (var offset in movePattern)
         {
             int targetCol = currentCol + offset.x;
             int targetRow = currentRow + offset.y;
 
-            if (IsValidCoordinate(targetCol, targetRow) && _grid[targetCol, targetRow] == null)
+            if (IsValidCoordinate(targetCol, targetRow) && _grid[targetCol, targetRow] == null && !_obstacles[targetCol, targetRow])
             {
                 availableMoves.Add(new Vector2Int(targetCol, targetRow));
             }
@@ -102,9 +107,70 @@ public class GridManager : MonoBehaviour
         return availableMoves;
     }
 
-    /// <summary>
-    /// 全グリッドをクリアする（リセット時用）
-    /// </summary>
+    public bool IsValidMove(Vector2Int targetPos)
+    {
+        if (SelectedUnit == null) return false;
+        var available = GetAvailableMoves(SelectedUnit, _selectedUnitPos.x, _selectedUnitPos.y);
+        return available.Contains(targetPos);
+    }
+
+    public void SelectUnit(Unit unit)
+    {
+        SelectedUnit = unit;
+        for (int c = 0; c < Cols; c++)
+        {
+            for (int r = 0; r < Rows; r++)
+            {
+                if (_grid[c, r] == unit)
+                {
+                    _selectedUnitPos = new Vector2Int(c, r);
+                    return;
+                }
+            }
+        }
+    }
+
+    public void DeselectUnit()
+    {
+        SelectedUnit = null;
+    }
+
+    public void ReserveMove(Unit unit, Vector2Int targetPos)
+    {
+        if (_reservedMoves.ContainsKey(unit))
+        {
+            _reservedMoves[unit] = targetPos;
+        }
+        else
+        {
+            _reservedMoves.Add(unit, targetPos);
+        }
+    }
+
+    public List<Unit> GetAllUnits()
+    {
+        List<Unit> list = new List<Unit>();
+        for (int c = 0; c < Cols; c++)
+        {
+            for (int r = 0; r < Rows; r++)
+            {
+                if (_grid[c, r] != null)
+                {
+                    list.Add(_grid[c, r]);
+                }
+            }
+        }
+        return list;
+    }
+
+    public void SetCellObstacle(Vector2Int pos, bool isObstacle)
+    {
+        if (IsValidCoordinate(pos.x, pos.y))
+        {
+            _obstacles[pos.x, pos.y] = isObstacle;
+        }
+    }
+
     public void ClearGrid()
     {
         for (int c = 0; c < Cols; c++)
@@ -112,7 +178,9 @@ public class GridManager : MonoBehaviour
             for (int r = 0; r < Rows; r++)
             {
                 _grid[c, r] = null;
+                _obstacles[c, r] = false;
             }
         }
+        _reservedMoves.Clear();
     }
 }
