@@ -22,6 +22,9 @@ public class CardManager : MonoBehaviour
     public bool IsCardSelected { get; private set; }
     private CardData selectedCard;
 
+    public int CurrentCost => currentCost;
+    public int MaxCost => maxCost;
+
     private void Awake()
     {
         if (gridManager == null)
