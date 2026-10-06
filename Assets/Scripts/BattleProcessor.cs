@@ -1,3 +1,5 @@
+// Responsibility: Processes combat between units using element advantages and power checks, and handles base attacks.
+// Attachment Note: Attach this script to a BattleManager or GameManager GameObject in the scene.
 using UnityEngine;
 using System.Collections.Generic;
 
