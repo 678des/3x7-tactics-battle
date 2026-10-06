@@ -6,12 +6,10 @@ using UnityEngine;
 /// <summary>
 /// 手札のカードのビジュアル表示と選択状態を管理するクラス。
 /// </summary>
-[RequireComponent(typeof(UnityEngine.RectTransform))]
 public class CardView : MonoBehaviour
 {
     [SerializeField] private CardData cardData;
     [SerializeField] private CardManager cardManager;
-    [SerializeField] private float floatOffset = 30f;
 
     private bool isSelected = false;
     private Vector3 originalPosition;
@@ -34,7 +32,7 @@ public class CardView : MonoBehaviour
         isSelected = selected;
         if (isSelected)
         {
-            transform.localPosition = originalPosition + new Vector3(0f, floatOffset, 0f);
+            transform.localPosition = originalPosition + new Vector3(0f, 1, 0f);
         }
         else
         {
@@ -42,11 +40,11 @@ public class CardView : MonoBehaviour
         }
     }
 
-    public void OnCardClicked()
+
+    private void OnMouseDown()
     {
-        if (cardManager != null)
-        {
-            cardManager.SelectCard(cardData, this);
-        }
+        Debug.Log(gameObject.name + " がクリックされました！");
+
+        cardManager.SelectCard(cardData, this);
     }
 }

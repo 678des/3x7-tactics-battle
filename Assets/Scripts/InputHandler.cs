@@ -47,11 +47,7 @@ public class InputHandler : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit cardHit, 100f, cardLayerMask))
         {
             CardView cardView = cardHit.collider.GetComponent<CardView>();
-            if (cardView != null)
-            {
-                cardView.OnCardClicked();
-                return;
-            }
+        
         }
 
         if (Physics.Raycast(ray, out RaycastHit hit, 100f, gridLayerMask))

@@ -18,6 +18,8 @@ public class GridManager : MonoBehaviour
     private const int Rows = 7;
     private const int Cols = 3;
 
+    public Quaternion cardRotation = Quaternion.Euler(0, 90f, 0);
+
     [Header("Grid Settings")]
     [SerializeField, Tooltip("生成するマスのPrefab")]
     private GameObject cellPrefab;
@@ -74,7 +76,7 @@ public class GridManager : MonoBehaviour
         if (team == TeamType.Player)
         {
             // プレイヤーの陣地は行0付近を想定（必要に応じて調整）
-            for (int r = 0; r < 2 && r < Rows; r++)
+            for (int r = -1; r < 2 && r < Rows; r++)
             {
                 for (int c = 0; c < Cols; c++)
                 {
@@ -88,7 +90,7 @@ public class GridManager : MonoBehaviour
         else
         {
             // 敵の陣地は行Rows-1付近を想定
-            for (int r = Rows - 1; r >= Rows - 2 && r >= 0; r--)
+            for (int r = Rows; r >= Rows - 2 && r >= 0; r--)
             {
                 for (int c = 0; c < Cols; c++)
                 {
@@ -103,7 +105,7 @@ public class GridManager : MonoBehaviour
         // 均等に配置するためにリストをシャッフルまたはそのまま利用して順に配置
         for (int i = 0; i < cardPrefabs.Count && i < availablePositions.Count; i++)
         {
-            Quaternion cardRotation = Quaternion.Euler(0, 90f, 0);
+           
             SpawnUnit(cardPrefabs[i], availablePositions[i], cardRotation);
         }
     }
