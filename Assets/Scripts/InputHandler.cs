@@ -1,28 +1,20 @@
-// Responsibility: Mobile touch and mouse input detection for triggering gameplay actions (move reservations, card usage).
+// Responsibility: Mobile touch and mouse input detection for triggering card usage.
 // Attachment Note: Attach to a persistent GameObject or GameManager GameObject in the scene.
 
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// モバイルタッチおよびマウス入力を検知し、ゲーム内のアクション（移動予約、カード使用）をトリガーするクラス。
+/// モバイルタッチおよびマウス入力を検知し、ゲーム内のアクション（カード使用等）をトリガーするクラス。
 /// </summary>
 [RequireComponent(typeof(UnityEngine.Transform))]
 public class InputHandler : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private LayerMask gridLayerMask;
     [SerializeField] private LayerMask cardLayerMask;
-
-    private GameManager _gameManager;
-    private GridManager _gridManager;
-    private CardManager _cardManager;
 
     private void Awake()
     {
-        _gameManager = FindFirstObjectByType<GameManager>();
-        _gridManager = FindFirstObjectByType<GridManager>();
-        _cardManager = FindFirstObjectByType<CardManager>();
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
@@ -47,54 +39,6 @@ public class InputHandler : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit cardHit, 100f, cardLayerMask))
         {
             CardView cardView = cardHit.collider.GetComponent<CardView>();
-        
-        }
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f, gridLayerMask))
-        {
-            GridCell cell = hit.collider.GetComponent<GridCell>();
-            if (cell == null)
-                return;
-
-            Vector2Int gridPos = cell.GridPosition;
-
-            switch (GameManager.CurrentPhase)
-            {
-                case GameManager.GamePhase.Spawn:
-                    if (_cardManager.IsCardSelected)
-                    {
-                        _cardManager.UseSelectedCard(gridPos);
-                    }
-                    break;
-
-                case GameManager.GamePhase.MoveReservation:
-                    ProcessMoveReservation(gridPos);
-                    break;
-            }
-        }
-    }
-
-    private void ProcessMoveReservation(Vector2Int targetPos)
-    {
-        if (_gridManager.SelectedUnit == null)
-        {
-            var unit = _gridManager.GetUnitAt(targetPos);
-            if (unit != null && unit.IsPlayerOwned)
-            {
-                _gridManager.SelectUnit(unit);
-            }
-        }
-        else
-        {
-            if (_gridManager.IsValidMove(targetPos))
-            {
-                _gridManager.ReserveMove(_gridManager.SelectedUnit, targetPos);
-                _gridManager.DeselectUnit();
-            }
-            else
-            {
-                _gridManager.DeselectUnit();
-            }
         }
     }
 }
