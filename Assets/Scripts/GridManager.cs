@@ -9,7 +9,7 @@ public enum TeamType
 
 /// <summary>
 /// 3x7のグリッド管理クラス。
-/// マスのデータ保持、キャラクターの配置管理、移動判定、およびCubeによる初期マス生成を行う。
+/// マスのデータ保持、キャラクターの配置管理、移動判定、およびプレハブによる初期マス生成を行う。
 /// このスクリプトは、グリッドの原点となる空のGameObjectにアタッチしてください。
 /// </summary>
 [RequireComponent(typeof(UnityEngine.Transform))]
@@ -17,6 +17,10 @@ public class GridManager : MonoBehaviour
 {
     private const int Rows = 7;
     private const int Cols = 3;
+
+    [Header("Grid Settings")]
+    [SerializeField, Tooltip("生成するマスのPrefab")]
+    private GameObject cellPrefab;
 
     private Unit[,] _grid = new Unit[Cols, Rows];
     private bool[,] _obstacles = new bool[Cols, Rows];
@@ -31,19 +35,23 @@ public class GridManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 3x7のマスを一つ一つCubeで生成する初期関数
+    /// 3x7のマスをプレハブから生成する初期関数
     /// </summary>
     private void GenerateGridCubes()
     {
+        if (cellPrefab == null)
+        {
+            Debug.LogWarning("Cell Prefab is not assigned in GridManager.");
+            return;
+        }
+
         for (int c = 0; c < Cols; c++)
         {
             for (int r = 0; r < Rows; r++)
             {
-                GameObject cellCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cellCube.name = "Cell_" + c + "_" + r;
-                cellCube.transform.position = new Vector3(c, 0, r);
-                cellCube.transform.localScale = new Vector3(0.95f, 0.1f, 0.95f);
-                cellCube.transform.SetParent(this.transform);
+                GameObject cellObj = Instantiate(cellPrefab, new Vector3(c, 0, r), Quaternion.identity);
+                cellObj.name = "Cell_" + c + "_" + r;
+                cellObj.transform.SetParent(this.transform);
             }
         }
     }
