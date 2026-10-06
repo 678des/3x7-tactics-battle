@@ -103,7 +103,9 @@ public class GridManager : MonoBehaviour
         // 均等に配置するためにリストをシャッフルまたはそのまま利用して順に配置
         for (int i = 0; i < cardPrefabs.Count && i < availablePositions.Count; i++)
         {
-            SpawnUnit(cardPrefabs[i], availablePositions[i]);
+            //SpawnUnitを使わずに直接スポーンさせて。Zで90度曲げて
+
+            //SpawnUnit(cardPrefabs[i], availablePositions[i]);
         }
     }
 

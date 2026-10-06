@@ -506,6 +506,14 @@ MonoBehaviour:
   gridManager: {fileID: 1534873815}
   battleProcessor: {fileID: 537348235}
   enemyAI: {fileID: 220391721}
+  playerStartingCards:
+  - {fileID: 2342147767846308965, guid: 063ba80ab2b029646bb2225e2efb6fcf, type: 3}
+  - {fileID: 2342147767846308965, guid: c005372c0bf953540b407706765a4de6, type: 3}
+  - {fileID: 2342147767846308965, guid: 7f16e239c5dd9f840b4a441878ddf5f3, type: 3}
+  enemyStartingCards:
+  - {fileID: 2342147767846308965, guid: 9a9b36dff318f6e4695a1156c3c9a1e7, type: 3}
+  - {fileID: 2342147767846308965, guid: c50653029b003df4e8b992e3dc935b9e, type: 3}
+  - {fileID: 2342147767846308965, guid: 6945dcf301b727a44afca33cd5c77a72, type: 3}
 --- !u!114 &537348237
 MonoBehaviour:
   m_ObjectHideFlags: 0
