@@ -1,0 +1,22 @@
+/Library/
+/Temp/
+/Logs/
+/Obj/
+/UserSettings/
+Packages/packages-lock.json
+/Assets/TextMesh Pro/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.DS_Store
