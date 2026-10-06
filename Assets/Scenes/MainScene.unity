@@ -581,6 +581,12 @@ MonoBehaviour:
   currentCost: 3
   maxCost: 3
   gridManager: {fileID: 1534873815}
+  hand:
+  - cardName: Akazukin
+    type: 0
+    cost: 0
+    unitPrefab: {fileID: 0}
+    powerModifier: 0
 --- !u!1 &564659737
 GameObject:
   m_ObjectHideFlags: 0

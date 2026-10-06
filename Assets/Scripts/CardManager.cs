@@ -17,7 +17,8 @@ public class CardManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private GridManager gridManager;
 
-    private List<CardData> hand = new List<CardData>();
+    [Header("Card Database / Hand")]
+    [SerializeField] private List<CardData> hand = new List<CardData>();
 
     public bool IsCardSelected { get; private set; }
     private CardData selectedCard;
