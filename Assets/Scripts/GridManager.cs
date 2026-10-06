@@ -103,9 +103,8 @@ public class GridManager : MonoBehaviour
         // 均等に配置するためにリストをシャッフルまたはそのまま利用して順に配置
         for (int i = 0; i < cardPrefabs.Count && i < availablePositions.Count; i++)
         {
-            //SpawnUnitを使わずに直接スポーンさせて。Zで90度曲げて
-
-            //SpawnUnit(cardPrefabs[i], availablePositions[i]);
+            Quaternion cardRotation = Quaternion.Euler(0, 90f, 0);
+            SpawnUnit(cardPrefabs[i], availablePositions[i], cardRotation);
         }
     }
 
@@ -123,12 +122,17 @@ public class GridManager : MonoBehaviour
 
     public void SpawnUnit(GameObject unitPrefab, Vector2Int pos)
     {
+        SpawnUnit(unitPrefab, pos, Quaternion.identity);
+    }
+
+    public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation)
+    {
         if (!IsValidCoordinate(pos.x, pos.y)) return;
         if (IsCellOccupied(pos)) return;
 
         if (unitPrefab != null)
         {
-            GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), Quaternion.identity);
+            GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
             Unit unit = obj.GetComponent<Unit>();
             if (unit != null)
             {
