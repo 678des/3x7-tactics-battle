@@ -22,6 +22,7 @@ public class CardManager : MonoBehaviour
 
     public bool IsCardSelected { get; private set; }
     private CardData selectedCard;
+    private CardView selectedView;
 
     public int CurrentCost => currentCost;
     public int MaxCost => maxCost;
@@ -37,10 +38,21 @@ public class CardManager : MonoBehaviour
         currentCost = maxCost;
     }
 
-    public void SelectCard(CardData card)
+    public void SelectCard(CardData card, CardView view)
     {
+        if (selectedView != null)
+        {
+            selectedView.SetSelected(false);
+        }
+
         selectedCard = card;
+        selectedView = view;
         IsCardSelected = (card != null);
+
+        if (selectedView != null)
+        {
+            selectedView.SetSelected(true);
+        }
     }
 
     public void UseSelectedCard(Vector2Int targetPosition)
@@ -48,9 +60,17 @@ public class CardManager : MonoBehaviour
         if (!IsCardSelected || selectedCard == null)
             return;
 
-        TryUseCard(selectedCard, targetPosition);
-        selectedCard = null;
-        IsCardSelected = false;
+        if (TryUseCard(selectedCard, targetPosition))
+        {
+            if (selectedView != null)
+            {
+                selectedView.SetSelected(false);
+                Destroy(selectedView.gameObject);
+            }
+            selectedCard = null;
+            selectedView = null;
+            IsCardSelected = false;
+        }
     }
 
     public bool TryUseCard(CardData card, Vector2Int targetPosition)
