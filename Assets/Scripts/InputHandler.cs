@@ -48,14 +48,14 @@ public class InputHandler : MonoBehaviour
 
             switch (GameManager.CurrentPhase)
             {
-                case GamePhase.Spawn:
+                case GameManager.GamePhase.Spawn:
                     if (_cardManager.IsCardSelected)
                     {
                         _cardManager.UseSelectedCard(gridPos);
                     }
                     break;
 
-                case GamePhase.MoveReservation:
+                case GameManager.GamePhase.MoveReservation:
                     ProcessMoveReservation(gridPos);
                     break;
             }
