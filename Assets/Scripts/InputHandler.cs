@@ -12,6 +12,7 @@ public class InputHandler : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
     [SerializeField] private LayerMask gridLayerMask;
+    [SerializeField] private LayerMask cardLayerMask;
 
     private GameManager _gameManager;
     private GridManager _gridManager;
@@ -22,6 +23,10 @@ public class InputHandler : MonoBehaviour
         _gameManager = FindFirstObjectByType<GameManager>();
         _gridManager = FindFirstObjectByType<GridManager>();
         _cardManager = FindFirstObjectByType<CardManager>();
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
     }
 
     private void Update()
@@ -38,6 +43,17 @@ public class InputHandler : MonoBehaviour
             return;
 
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out RaycastHit cardHit, 100f, cardLayerMask))
+        {
+            CardView cardView = cardHit.collider.GetComponent<CardView>();
+            if (cardView != null)
+            {
+                cardView.OnCardClicked();
+                return;
+            }
+        }
+
         if (Physics.Raycast(ray, out RaycastHit hit, 100f, gridLayerMask))
         {
             GridCell cell = hit.collider.GetComponent<GridCell>();

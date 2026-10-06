@@ -11,10 +11,17 @@ public class CardView : MonoBehaviour
 {
     [SerializeField] private CardData cardData;
     [SerializeField] private CardManager cardManager;
+    [SerializeField] private float floatOffset = 30f;
 
     private bool isSelected = false;
+    private Vector3 originalPosition;
 
     public CardData CardData => cardData;
+
+    private void Awake()
+    {
+        originalPosition = transform.localPosition;
+    }
 
     public void Initialize(CardData data, CardManager manager)
     {
@@ -25,7 +32,14 @@ public class CardView : MonoBehaviour
     public void SetSelected(bool selected)
     {
         isSelected = selected;
-        // 選択状態に応じた視覚表現の切り替えをここに記述できます
+        if (isSelected)
+        {
+            transform.localPosition = originalPosition + new Vector3(0f, floatOffset, 0f);
+        }
+        else
+        {
+            transform.localPosition = originalPosition;
+        }
     }
 
     public void OnCardClicked()
