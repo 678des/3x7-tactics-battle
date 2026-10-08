@@ -29,4 +29,28 @@ public class UIManager : MonoBehaviour
     {
         if (cardManager != null && costText != null)
         {
-            costText.text = $
+            costText.text = cardManager.CurrentCost.ToString() + " / " + cardManager.MaxCost.ToString();
+        }
+    }
+
+    private void UpdateBaseHpDisplay()
+    {
+        if (playerBase != null && playerBaseHpText != null)
+        {
+            playerBaseHpText.text = "Player HP: " + playerBase.CurrentHp.ToString();
+        }
+
+        if (enemyBase != null && enemyBaseHpText != null)
+        {
+            enemyBaseHpText.text = "Enemy HP: " + enemyBase.CurrentHp.ToString();
+        }
+    }
+
+    private void UpdatePhaseDisplay()
+    {
+        if (GameManager.Instance != null && phaseText != null)
+        {
+            phaseText.text = "Phase: " + GameManager.Instance.CurrentPhase.ToString();
+        }
+    }
+}
