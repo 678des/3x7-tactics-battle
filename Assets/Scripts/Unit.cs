@@ -30,13 +30,11 @@ public class Unit : MonoBehaviour
             return;
         }
 
-        if (GameManager.Instance != null && GameManager.CurrentPhase == GamePhase.Planning)
-        {
             if (GridManager.Instance != null)
             {
                 Vector2Int targetPos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
                 GridManager.Instance.ReserveMove(this, targetPos);
             }
-        }
+        
     }
 }
