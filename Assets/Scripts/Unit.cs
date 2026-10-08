@@ -1,9 +1,9 @@
+// Responsibility: Represents an in-game unit that handles player clicks during the ReservePhase to schedule movement via GridManager.
+// Attachment Note: Attach this script to Unit GameObjects that have a Collider for mouse clicking.
+
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// ゲーム内のキャラクター（ユニット）を表すコンポーネント。
-/// </summary>
 [RequireComponent(typeof(UnityEngine.Transform))]
 public class Unit : MonoBehaviour
 {
@@ -21,5 +21,21 @@ public class Unit : MonoBehaviour
     public void ApplyBuff(int amount)
     {
         Debug.Log($"{gameObject.name} にバフ適用: +{amount}");
+    }
+
+    private void OnMouseDown()
+    {
+        if (!isPlayerOwned)
+        { 
+            return;
+        }
+
+        if (GameManager.Instance != null && GameManager.Instance.CurrentPhase == GameManager.Phase.ReservePhase)
+        {
+            if (GridManager.Instance != null)
+            {
+                GridManager.Instance.ReserveUnitMovement(this);
+            }
+        }
     }
 }
