@@ -34,7 +34,7 @@ public class Unit : MonoBehaviour
         {
             if (GridManager.Instance != null)
             {
-                Vector2Int targetPos = Vector2Int.roundToInt(transform.position);
+                Vector2Int targetPos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
                 GridManager.Instance.ReserveMove(this, targetPos);
             }
         }
