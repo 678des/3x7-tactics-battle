@@ -1,4 +1,4 @@
-// Responsibility: Represents an in-game unit that handles player clicks during the ReservePhase to schedule movement via GridManager.
+// Responsibility: Represents an in-game unit that handles player clicks during the Planning phase to schedule movement via GridManager.
 // Attachment Note: Attach this script to Unit GameObjects that have a Collider for mouse clicking.
 
 using UnityEngine;
@@ -30,11 +30,12 @@ public class Unit : MonoBehaviour
             return;
         }
 
-        if (GameManager.Instance != null && GameManager.Instance.CurrentPhase == GamePhase.Planning)
+        if (GameManager.Instance != null && GameManager.CurrentPhase == GamePhase.Planning)
         {
             if (GridManager.Instance != null)
             {
-                GridManager.Instance.ReserveMove(this);
+                Vector2Int targetPos = Vector2Int.roundToInt(transform.position);
+                GridManager.Instance.ReserveMove(this, targetPos);
             }
         }
     }
