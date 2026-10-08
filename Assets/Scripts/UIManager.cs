@@ -48,9 +48,9 @@ public class UIManager : MonoBehaviour
 
     private void UpdatePhaseDisplay()
     {
-        if (GameManager.Instance != null && phaseText != null)
+        if ( phaseText != null)
         {
-            phaseText.text = "Phase: " + GameManager.Instance.CurrentPhase.ToString();
+            phaseText.text = "Phase: " + GameManager.CurrentPhase.ToString();
         }
     }
 }

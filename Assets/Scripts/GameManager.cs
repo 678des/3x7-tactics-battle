@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private System.Collections.Generic.List<GameObject> enemyStartingCards;
 
     public static GamePhase CurrentPhase { get; private set; }
+    public static GameManager Instance;
 
     private void Awake()
     {
@@ -32,6 +33,7 @@ public class GameManager : MonoBehaviour
         if (gridManager == null) gridManager = GetComponent<GridManager>();
         if (battleProcessor == null) battleProcessor = GetComponent<BattleProcessor>();
         if (enemyAI == null) enemyAI = GetComponent<EnemyAI>();
+        Instance = this;
     }
 
     private void Start()

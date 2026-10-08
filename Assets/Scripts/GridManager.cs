@@ -15,6 +15,7 @@ public enum TeamType
 [RequireComponent(typeof(UnityEngine.Transform))]
 public class GridManager : MonoBehaviour
 {
+    public static GridManager Instance;
     private const int Rows = 7;
     private const int Cols = 3;
 
@@ -31,6 +32,10 @@ public class GridManager : MonoBehaviour
     private Vector2Int _selectedUnitPos;
     private Dictionary<Unit, Vector2Int> _reservedMoves = new Dictionary<Unit, Vector2Int>();
 
+    private void Awake()
+    {
+        Instance = this;
+    }
     private void Start()
     {
         GenerateGridCubes();
