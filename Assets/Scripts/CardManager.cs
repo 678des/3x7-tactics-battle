@@ -124,20 +124,3 @@ public class CardManager : MonoBehaviour
         gridManager.SetCellObstacle(targetPosition, true);
     }
 }
-
-public enum CardType
-{
-    Summon,
-    Buff,
-    Debuff
-}
-
-[System.Serializable]
-public class CardData
-{
-    public string cardName;
-    public CardType type;
-    public int cost;
-    public GameObject unitPrefab;
-    public int powerModifier;
-}

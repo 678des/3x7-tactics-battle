@@ -39,6 +39,14 @@ public class InputHandler : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit cardHit, 100f, cardLayerMask))
         {
             CardView cardView = cardHit.collider.GetComponent<CardView>();
+            if (cardView != null)
+            {
+                CardManager cardManager = FindFirstObjectByType<CardManager>();
+                if (cardManager != null)
+                {
+                    cardManager.SelectCard(cardView.CardData, cardView);
+                }
+            }
         }
     }
 }
