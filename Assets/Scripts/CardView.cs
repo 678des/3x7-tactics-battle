@@ -21,6 +21,14 @@ public class CardView : MonoBehaviour
         originalPosition = transform.localPosition;
     }
 
+    private void Start()
+    {
+        if (cardManager == null)
+        {
+            cardManager = Object.FindAnyObjectByType<CardManager>();
+        }
+    }
+
     public void Initialize(CardData data, CardManager manager)
     {
         cardData = data;
@@ -45,6 +53,9 @@ public class CardView : MonoBehaviour
     {
         Debug.Log(gameObject.name + " がクリックされました！");
 
-        cardManager.SelectCard(cardData, this);
+        if (cardManager != null)
+        {
+            cardManager.SelectCard(cardData, this);
+        }
     }
 }
