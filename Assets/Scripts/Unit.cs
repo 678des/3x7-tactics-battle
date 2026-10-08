@@ -30,11 +30,11 @@ public class Unit : MonoBehaviour
             return;
         }
 
-        if ( GameManager.CurrentPhase == GamePhase.ReservePhase)
+        if (GameManager.Instance != null && GameManager.Instance.CurrentPhase == GamePhase.Planning)
         {
             if (GridManager.Instance != null)
             {
-                GridManager.Instance.ReserveUnitMovement(this);
+                GridManager.Instance.ReserveMove(this);
             }
         }
     }
