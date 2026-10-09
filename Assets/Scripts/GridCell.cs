@@ -38,13 +38,15 @@ public class GridCell : MonoBehaviour
         switch (GameManager.CurrentPhase)
         {
             case GameManager.GamePhase.Spawn:
-                if (_cardManager != null && _cardManager.IsCardSelected)
+
+                if (_cardManager != null)
                 {
                     _cardManager.UseSelectedCard(gridPosition);
                 }
                 break;
 
             case GameManager.GamePhase.MoveReservation:
+                Debug.Log("移動予約のPhaseではある");
                 ProcessMoveReservation(gridPosition);
                 break;
         }
@@ -52,28 +54,10 @@ public class GridCell : MonoBehaviour
 
     private void ProcessMoveReservation(Vector2Int targetPos)
     {
-        if (_gridManager == null)
-            return;
 
-        if (_gridManager.SelectedUnit == null)
-        {
-            var unit = _gridManager.GetUnitAt(targetPos);
-            if (unit != null && unit.IsPlayerOwned)
-            {
-                _gridManager.SelectUnit(unit);
-            }
-        }
-        else
-        {
-            if (_gridManager.IsValidMove(targetPos))
-            {
-                _gridManager.ReserveMove(_gridManager.SelectedUnit, targetPos);
-                _gridManager.DeselectUnit();
-            }
-            else
-            {
-                _gridManager.DeselectUnit();
-            }
-        }
+        Debug.Log("移動予約を今から");
+        _gridManager.ReserveMove(_gridManager.SelectedUnit, targetPos);
+        _gridManager.DeselectUnit();
+
     }
 }

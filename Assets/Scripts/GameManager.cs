@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 
 /// <summary>
 /// ゲームのフェーズ遷移を管理するメインコントローラー。
@@ -22,7 +21,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Initial Setup")]
     [SerializeField] private System.Collections.Generic.List<GameObject> playerStartingCards;
-    [SerializeField] private System.Collections.Generic.List<GameObject> enemyStartingCards;
+    public System.Collections.Generic.List<GameObject> enemyStartingCards;
 
     public static GamePhase CurrentPhase { get; private set; }
     public static GameManager Instance;
@@ -60,9 +59,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// フェーズを開始する。
-    /// </summary>
     public void StartPhase(GamePhase phase)
     {
         CurrentPhase = phase;
@@ -70,7 +66,7 @@ public class GameManager : MonoBehaviour
         switch (phase)
         {
             case GamePhase.Spawn:
-                // コスト全回復処理などをここに記述
+                enemyAI.ExecuteEnemySpawnPhase();
                 break;
             case GamePhase.MoveReservation:
                 // プレイヤーの入力を許可
@@ -89,13 +85,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void ExecuteMovement()
     {
-        // 1. 敵AIの移動予約を確定させる
         enemyAI.ExecuteEnemyTurn();
-
-        // 2. GridManagerを通じて全ユニットを移動させる
         gridManager.ProcessAllUnitMovements();
-
-        // 移動完了後、バトルフェーズへ移行
         StartPhase(GamePhase.Battle);
     }
 
@@ -104,10 +95,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void ExecuteBattle()
     {
-        // BattleProcessorに判定を委譲
+        Debug.Log("バトル実行");
         battleProcessor.ResolveAllBattles();
-
-        // バトル終了後、次のターンのスポーンフェーズへ
         StartPhase(GamePhase.Spawn);
     }
 
@@ -120,5 +109,10 @@ public class GameManager : MonoBehaviour
         {
             StartPhase(GamePhase.MoveExecution);
         }
+        else if (CurrentPhase == GamePhase.Spawn)
+        {
+            StartPhase(GamePhase.MoveReservation);
+        }
     }
+
 }

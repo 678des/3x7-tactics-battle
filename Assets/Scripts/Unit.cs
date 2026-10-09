@@ -1,8 +1,8 @@
 // Responsibility: Represents an in-game unit that handles player clicks during the Planning phase to schedule movement via GridManager.
 // Attachment Note: Attach this script to Unit GameObjects that have a Collider for mouse clicking.
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 [RequireComponent(typeof(UnityEngine.Transform))]
 public class Unit : MonoBehaviour
@@ -11,6 +11,9 @@ public class Unit : MonoBehaviour
     [SerializeField] private List<Vector2Int> movePattern = new List<Vector2Int> { new Vector2Int(0, 1) };
     [SerializeField] private ElementType element = ElementType.Fire;
     [SerializeField] private int power = 10;
+
+    // 💡 追加: 移動予定のマス（未定のときは null）
+    public Vector2Int? PlannedDestination { get; set; } = null;
 
     public bool IsPlayerOwned => isPlayerOwned;
     public bool isPlayerSide => isPlayerOwned;
@@ -23,18 +26,20 @@ public class Unit : MonoBehaviour
         Debug.Log($"{gameObject.name} にバフ適用: +{amount}");
     }
 
+    // 💡 追加: 移動予約をクリアする用
+    public void ClearDestination()
+    {
+        PlannedDestination = null;
+    }
+
     private void OnMouseDown()
     {
         if (!isPlayerOwned)
-        { 
+        {
             return;
         }
+        Debug.Log("ユニットクリック");
+        GridManager.Instance.SelectUnit(this);
 
-            if (GridManager.Instance != null)
-            {
-                Vector2Int targetPos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
-                GridManager.Instance.ReserveMove(this, targetPos);
-            }
-        
     }
 }

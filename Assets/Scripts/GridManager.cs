@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public enum TeamType
 {
@@ -110,7 +110,7 @@ public class GridManager : MonoBehaviour
         // 均等に配置するためにリストをシャッフルまたはそのまま利用して順に配置
         for (int i = 0; i < cardPrefabs.Count && i < availablePositions.Count; i++)
         {
-           
+
             SpawnUnit(cardPrefabs[i], availablePositions[i], cardRotation);
         }
     }
@@ -127,10 +127,7 @@ public class GridManager : MonoBehaviour
         return _grid[pos.x, pos.y] != null || _obstacles[pos.x, pos.y];
     }
 
-    public void SpawnUnit(GameObject unitPrefab, Vector2Int pos)
-    {
-        SpawnUnit(unitPrefab, pos, Quaternion.identity);
-    }
+
 
     public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation)
     {
@@ -141,10 +138,9 @@ public class GridManager : MonoBehaviour
         {
             GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
             Unit unit = obj.GetComponent<Unit>();
-            if (unit != null)
-            {
-                _grid[pos.x, pos.y] = unit;
-            }
+
+            _grid[pos.x, pos.y] = unit;
+
         }
     }
 
@@ -214,16 +210,17 @@ public class GridManager : MonoBehaviour
         return GetAvailableMoves(unit, currentPos.x, currentPos.y);
     }
 
-    public bool IsValidMove(Vector2Int targetPos)
-    {
-        if (SelectedUnit == null) return false;
-        var available = GetAvailableMoves(SelectedUnit, _selectedUnitPos.x, _selectedUnitPos.y);
-        return available.Contains(targetPos);
-    }
+    //public bool IsValidMove(Vector2Int targetPos)
+    //{
+    //    if (SelectedUnit == null) return false;
+    //    var available = GetAvailableMoves(SelectedUnit, _selectedUnitPos.x, _selectedUnitPos.y);
+    //    return available.Contains(targetPos);
+    //}
 
     public void SelectUnit(Unit unit)
     {
         SelectedUnit = unit;
+        Debug.Log($"{unit}選択した");
         for (int c = 0; c < Cols; c++)
         {
             for (int r = 0; r < Rows; r++)
@@ -244,6 +241,7 @@ public class GridManager : MonoBehaviour
 
     public void ReserveMove(Unit unit, Vector2Int targetPos)
     {
+        Debug.Log($"{targetPos}移動予約した");
         if (_reservedMoves.ContainsKey(unit))
         {
             _reservedMoves[unit] = targetPos;
@@ -315,9 +313,9 @@ public class GridManager : MonoBehaviour
         }
         return list;
     }
-
     public void ProcessAllUnitMovements()
     {
+        Debug.Log($"すべてのユニット移動{_reservedMoves}");
         foreach (var kvp in _reservedMoves)
         {
             Unit unit = kvp.Key;
@@ -326,13 +324,21 @@ public class GridManager : MonoBehaviour
 
             if (IsValidCoordinate(currentPos.x, currentPos.y) && IsValidCoordinate(targetPos.x, targetPos.y))
             {
+                // 1. グリッドのデータを更新
                 _grid[currentPos.x, currentPos.y] = null;
                 _grid[targetPos.x, targetPos.y] = unit;
+
+                // 2. 実際の3Dオブジェクトの位置を移動させる
+                // ※ GridManager側にある「グリッド座標をワールド座標に変換する関数」を使ってください
+                Vector3 worldPos = GridToWorldPosition(targetPos);
+                unit.transform.position = worldPos;
+
+                // 3. ユニット側が持っている現在地データがあればそれも更新
+                // unit.CurrentPosition = targetPos; 
             }
         }
         _reservedMoves.Clear();
     }
-
     public void SetCellObstacle(Vector2Int pos, bool isObstacle)
     {
         if (IsValidCoordinate(pos.x, pos.y))
@@ -352,5 +358,82 @@ public class GridManager : MonoBehaviour
             }
         }
         _reservedMoves.Clear();
+        Debug.Log($"すべてのユニット移動完了");
+    }
+    /// <summary>
+    /// グリッド座標 (Vector2Int) をワールド座標 (Vector3) に変換する
+    /// </summary>
+    public Vector3 GridToWorldPosition(Vector2Int gridPos)
+    {
+        return new Vector3(gridPos.x, 0f, gridPos.y);
+    }
+
+    /// <summary>
+    /// ワールド座標 (Vector3) を一番近いグリッド座標 (Vector2Int) に変換する
+    /// </summary>
+    public Vector2Int WorldToGridPosition(Vector3 worldPos)
+    {
+        int x = Mathf.RoundToInt(worldPos.x);
+        int y = Mathf.RoundToInt(worldPos.z);
+        return new Vector2Int(x, y);
+    }// ==========================================
+    // 追加・補強が必要なメソッド群
+    // ==========================================
+
+    /// <summary>
+    /// 指定されたユニットの移動予約先を取得する
+    /// </summary>
+    public Vector2Int? GetReservedMove(Unit unit)
+    {
+        if (_reservedMoves.ContainsKey(unit))
+        {
+            return _reservedMoves[unit];
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 現在予約されているすべての移動リストを外部（GameManagerやBattleProcessorなど）から参照できるようにする
+    /// </summary>
+    public Dictionary<Unit, Vector2Int> GetAllReservedMoves()
+    {
+        return _reservedMoves;
+    }
+
+    /// <summary>
+    /// 移動予約をクリアする
+    /// </summary>
+    public void ClearReservedMoves()
+    {
+        _reservedMoves.Clear();
+    }
+
+    /// <summary>
+    /// EnemyAIやBattleProcessorから呼び出しやすい、チーム別の全ユニット取得
+    /// </summary>
+    public List<Unit> GetUnitsByTeam(bool isPlayerSide)
+    {
+        List<Unit> list = new List<Unit>();
+        foreach (var unit in GetAllUnits())
+        {
+            if (unit.IsPlayerOwned == isPlayerSide)
+            {
+                list.Add(unit);
+            }
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// 敵AIが移動先を選ぶ際に使用する「ユニットの移動可能マス（障害物や他のキャラを考慮しない純粋な移動範囲）」の取得
+    /// </summary>
+    public List<Vector2Int> GetMovableCells(Unit unit)
+    {
+        Vector2Int currentPos = GetUnitPosition(unit);
+        if (!IsValidCoordinate(currentPos.x, currentPos.y)) return new List<Vector2Int>();
+
+        return GetAvailableMoves(unit, currentPos.x, currentPos.y);
     }
 }
+
+

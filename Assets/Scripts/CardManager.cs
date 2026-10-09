@@ -1,8 +1,8 @@
 // Responsibility: Hand management, cost consumption, and card effect application.
 // Attachment Note: Attach to a GameManager or CardManager GameObject in the scene.
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// 手札の管理、コスト消費、カード効果の適用を行うマネージャークラス。
@@ -20,7 +20,6 @@ public class CardManager : MonoBehaviour
     [Header("Card Database / Hand")]
     [SerializeField] private List<CardData> hand = new List<CardData>();
 
-    public bool IsCardSelected { get; private set; }
     private CardData selectedCard;
     private CardView selectedView;
 
@@ -47,7 +46,6 @@ public class CardManager : MonoBehaviour
 
         selectedCard = card;
         selectedView = view;
-        IsCardSelected = (card != null);
 
         if (selectedView != null)
         {
@@ -57,8 +55,6 @@ public class CardManager : MonoBehaviour
 
     public void UseSelectedCard(Vector2Int targetPosition)
     {
-        if (!IsCardSelected || selectedCard == null)
-            return;
 
         if (TryUseCard(selectedCard, targetPosition))
         {
@@ -69,13 +65,14 @@ public class CardManager : MonoBehaviour
             }
             selectedCard = null;
             selectedView = null;
-            IsCardSelected = false;
         }
     }
 
     public bool TryUseCard(CardData card, Vector2Int targetPosition)
     {
-        if (currentCost < card.cost)
+        if (card == null) return false;
+        Debug.Log("try!");
+        if (card != null && currentCost < card.cost)
         {
             Debug.LogWarning("コスト不足です。");
             return false;
@@ -86,7 +83,8 @@ public class CardManager : MonoBehaviour
             case CardType.Summon:
                 if (!gridManager.IsCellOccupied(targetPosition))
                 {
-                    gridManager.SpawnUnit(card.unitPrefab, targetPosition);
+                    Debug.Log("try!!");
+                    gridManager.SpawnUnit(card.unitPrefab, targetPosition, Quaternion.identity);
                 }
                 else
                 {
@@ -95,11 +93,11 @@ public class CardManager : MonoBehaviour
                 break;
 
             case CardType.Buff:
-                ApplyBuff(card);
+                //ApplyBuff(card);
                 break;
 
             case CardType.Debuff:
-                ApplyDebuff(card, targetPosition);
+                // ApplyDebuff(card, targetPosition);
                 break;
         }
 
@@ -107,20 +105,20 @@ public class CardManager : MonoBehaviour
         return true;
     }
 
-    private void ApplyBuff(CardData card)
-    {
-        var units = gridManager.GetAllUnits();
-        foreach (var unit in units)
-        {
-            if (unit.isPlayerSide)
-            {
-                unit.ApplyBuff(card.powerModifier);
-            }
-        }
-    }
+    //private void ApplyBuff(CardData card)
+    //{
+    //    var units = gridManager.GetAllUnits();
+    //    foreach (var unit in units)
+    //    {
+    //        if (unit.isPlayerSide)
+    //        {
+    //            unit.ApplyBuff(card.powerModifier);
+    //        }
+    //    }
+    //}
 
-    private void ApplyDebuff(CardData card, Vector2Int targetPosition)
-    {
-        gridManager.SetCellObstacle(targetPosition, true);
-    }
+    //private void ApplyDebuff(CardData card, Vector2Int targetPosition)
+    //{
+    //    gridManager.SetCellObstacle(targetPosition, true);
+    //}
 }

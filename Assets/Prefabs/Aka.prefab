@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8944060536093517178}
   - component: {fileID: -1243480036500462133}
   m_Layer: 0
-  m_Name: Card
+  m_Name: Aka
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -125,10 +125,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 381a1ba19a9039049af932e313384829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardView
-  cardData:
-    cardName: 
-    type: 0
-    cost: 0
-    unitPrefab: {fileID: 0}
-    powerModifier: 0
+  cardData: {fileID: 11400000, guid: 0a79d5074a22ff943aea0237ed57b713, type: 2}
   cardManager: {fileID: 0}
