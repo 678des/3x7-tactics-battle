@@ -309,7 +309,6 @@ MonoBehaviour:
   enemyCurrentCost: 3
   enemyMaxCost: 3
   gridManager: {fileID: 1534873815}
-  enemyHand: []
 --- !u!4 &220391722
 Transform:
   m_ObjectHideFlags: 0

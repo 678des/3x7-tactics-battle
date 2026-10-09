@@ -4,42 +4,84 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(UnityEngine.Transform))]
 public class Unit : MonoBehaviour
 {
-    [SerializeField] private bool isPlayerOwned = true;
-    [SerializeField] private List<Vector2Int> movePattern = new List<Vector2Int> { new Vector2Int(0, 1) };
+    public enum ElementType { Fire, Water, Grass }
+
+
+    [Header("Unit Status")]
     [SerializeField] private ElementType element = ElementType.Fire;
     [SerializeField] private int power = 10;
 
-    // 💡 追加: 移動予定のマス（未定のときは null）
-    public Vector2Int? PlannedDestination { get; set; } = null;
-
-    public bool IsPlayerOwned => isPlayerOwned;
-    public bool isPlayerSide => isPlayerOwned;
-    public List<Vector2Int> MovePattern => movePattern;
+    public bool IsPlayerOwned = true;
     public ElementType Element => element;
-    public int Power => power;
+    public Vector2Int CurrentPosition { get; set; }
 
-    public void ApplyBuff(int amount)
+    public int CurrentPower
     {
-        Debug.Log($"{gameObject.name} にバフ適用: +{amount}");
+        get => power;
+        set => power = Mathf.Max(0, value);
     }
 
-    // 💡 追加: 移動予約をクリアする用
+    public Vector2Int? PlannedDestination { get; set; } = null;
+
+    [Header("Ranges (Relative Offsets)")]
+    [Tooltip("移動できるマスの相対座標リスト")]
+    public List<Vector2Int> MovePattern = new List<Vector2Int>
+    {
+        new Vector2Int( 0,  1), // 上
+        new Vector2Int( 0, -1), // 下
+        new Vector2Int( 1,  0), // 右
+        new Vector2Int(-1,  0), // 左
+        new Vector2Int( 1,  1), // 右上
+        new Vector2Int(-1,  1), // 左上
+        new Vector2Int( 1, -1), // 右下
+        new Vector2Int(-1, -1)  // 左下
+    };
+
+    [Tooltip("攻撃できるマスの相対座標リスト")]
+    public List<Vector2Int> AttackPattern = new List<Vector2Int>
+    {
+        new Vector2Int( 0,  1), // 上
+        new Vector2Int( 0, -1), // 下
+        new Vector2Int( 1,  0), // 右
+        new Vector2Int(-1,  0), // 左
+        new Vector2Int( 1,  1), // 右上
+        new Vector2Int(-1,  1), // 左上
+        new Vector2Int( 1, -1), // 右下
+        new Vector2Int(-1, -1)  // 左下
+    };
+
     public void ClearDestination()
     {
         PlannedDestination = null;
     }
 
+    public List<Vector2Int> GetAttackablePositions(Vector2Int currentPos)
+    {
+        List<Vector2Int> result = new List<Vector2Int>();
+
+        foreach (var offset in AttackPattern)
+        {
+            Vector2Int targetPos = currentPos + offset;
+            result.Add(targetPos);
+        }
+
+        return result;
+    }
+
     private void OnMouseDown()
     {
-        if (!isPlayerOwned)
+        if (!IsPlayerOwned)
         {
             return;
         }
-        Debug.Log("ユニットクリック");
-        GridManager.Instance.SelectUnit(this);
 
+        Debug.Log($"{gameObject.name} がクリックされました。");
+
+        if (GridManager.Instance != null)
+        {
+            GridManager.Instance.SelectUnit(this);
+        }
     }
 }

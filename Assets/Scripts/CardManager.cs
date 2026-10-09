@@ -1,7 +1,6 @@
 // Responsibility: Hand management, cost consumption, and card effect application.
 // Attachment Note: Attach to a GameManager or CardManager GameObject in the scene.
 
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -17,8 +16,6 @@ public class CardManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private GridManager gridManager;
 
-    [Header("Card Database / Hand")]
-    [SerializeField] private List<CardData> hand = new List<CardData>();
 
     private CardData selectedCard;
     private CardView selectedView;
@@ -84,7 +81,7 @@ public class CardManager : MonoBehaviour
                 if (!gridManager.IsCellOccupied(targetPosition))
                 {
                     Debug.Log("try!!");
-                    gridManager.SpawnUnit(card.unitPrefab, targetPosition, Quaternion.identity);
+                    gridManager.SpawnUnit(card.unitPrefab, targetPosition, Quaternion.identity, true);
                 }
                 else
                 {

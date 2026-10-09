@@ -1,96 +1,97 @@
-// Responsibility: Processes combat between units using element advantages and power checks, and handles base attacks.
-// Attachment Note: Attach this script to a BattleManager or GameManager GameObject in the scene.
-using UnityEngine;
 using System.Collections.Generic;
-
-public enum ElementType { Fire, Water, Grass }
+using UnityEngine;
 
 public class BattleProcessor : MonoBehaviour
 {
-    /// <summary>
-    /// 3すくみ判定の結果
-    /// </summary>
-    public enum BattleResult { Win, Lose, Draw }
-
-    /// <summary>
-    /// 属性相性による勝敗判定
-    /// </summary>
-    /// <param name="attacker">攻撃側の属性</param>
-    /// <param name="defender">防御側の属性</param>
-    /// <returns>攻撃側から見た結果</returns>
-    public BattleResult GetElementResult(ElementType attacker, ElementType defender)
+    public void ExecuteBattle()
     {
-        if (attacker == defender) return BattleResult.Draw;
+        // 1. 場にいるすべてのユニットを取得
+        List<Unit> allUnits = GridManager.Instance.GetAllUnits();
+        List<Unit> unitsToDestroy = new List<Unit>();
 
-        return attacker switch
+        Debug.Log("ユニット");
+
+        foreach (var attacker in allUnits)
         {
-            ElementType.Fire => (defender == ElementType.Grass) ? BattleResult.Win : BattleResult.Lose,
-            ElementType.Water => (defender == ElementType.Fire) ? BattleResult.Win : BattleResult.Lose,
-            ElementType.Grass => (defender == ElementType.Water) ? BattleResult.Win : BattleResult.Lose,
-            _ => BattleResult.Draw
-        };
-    }
+            if (attacker == null || unitsToDestroy.Contains(attacker)) continue;
 
-    /// <summary>
-    /// 全バトルの解決処理を実行する
-    /// </summary>
-    public void ResolveAllBattles()
-    {
-        // デフォルトの実装：全てのユニット間でのバトルを必要に応じて処理する
-    }
+            // 2. 自身の現在地から攻撃範囲（絶対座標のリスト）を算出
+            List<Vector2Int> attackablePositions = attacker.GetAttackablePositions(attacker.CurrentPosition);
 
-    /// <summary>
-    /// バトル処理を実行し、勝敗を判定して対象を撃破する
-    /// </summary>
-    /// <param name="attacker">攻撃ユニット</param>
-    /// <param name="defender">防御ユニット</param>
-    /// <returns>撃破されたユニットのリスト</returns>
-    public List<Unit> ResolveBattle(Unit attacker, Unit defender)
-    {
-        List<Unit> defeatedUnits = new List<Unit>();
-
-        BattleResult elementResult = GetElementResult(attacker.Element, defender.Element);
-
-        // 属性判定が引き分けの場合、パワーで比較
-        if (elementResult == BattleResult.Draw)
-        {
-            if (attacker.Power > defender.Power)
+            foreach (var position in attackablePositions)
             {
-                defeatedUnits.Add(defender);
+                Debug.Log($"{position}攻撃範囲！");
             }
-            else if (attacker.Power < defender.Power)
+            Unit targetEnemy = null;
+            bool isInBaseRange = false;
+
+            // 3. 攻撃範囲内のマスをチェック
+            foreach (var pos in attackablePositions)
             {
-                defeatedUnits.Add(attacker);
+                Unit occupant = GridManager.Instance.GetUnitAtPosition(pos);
+
+                if (occupant != null && occupant.IsPlayerOwned != attacker.IsPlayerOwned)
+                {
+                    targetEnemy = occupant;
+                    Debug.Log($"{attacker.IsPlayerOwned}敵を発見{targetEnemy}");
+
+
+                    break;
+                }
+
+                // 拠点に届いているかチェック（例：プレイヤーなら行6、敵なら行0）
+                if (attacker.IsPlayerOwned && pos.y >= 6)
+                {
+                    isInBaseRange = true;
+                }
+                else if (!attacker.IsPlayerOwned && pos.y <= 0)
+                {
+                    isInBaseRange = true;
+                }
             }
-            else
+
+            // 4. 判定・処理の実行
+            if (targetEnemy != null)
             {
-                // パワーも同じなら相打ち
-                defeatedUnits.Add(attacker);
-                defeatedUnits.Add(defender);
+                ResolveCombat(attacker, targetEnemy, unitsToDestroy);
+            }
+            else if (isInBaseRange)
+            {
+                ApplyBaseDamage(attacker);
             }
         }
-        else if (elementResult == BattleResult.Win)
+
+        // 5. 敗北したユニットを削除
+        foreach (var deadUnit in unitsToDestroy)
         {
-            defeatedUnits.Add(defender);
+            if (deadUnit != null)
+            {
+                Destroy(deadUnit.gameObject);
+            }
+        }
+    }
+
+
+
+    private void ResolveCombat(Unit attacker, Unit defender, List<Unit> destroyList)
+    {
+        if (attacker.CurrentPower > defender.CurrentPower)
+        {
+            destroyList.Add(defender);
+        }
+        else if (attacker.CurrentPower < defender.CurrentPower)
+        {
+            destroyList.Add(attacker);
         }
         else
         {
-            defeatedUnits.Add(attacker);
+            destroyList.Add(attacker);
+            destroyList.Add(defender);
         }
-
-        return defeatedUnits;
     }
 
-    /// <summary>
-    /// 拠点攻撃処理
-    /// </summary>
-    /// <param name="attacker">攻撃ユニット</param>
-    /// <param name="baseObject">拠点オブジェクト（HPを持つ想定）</param>
-    public void ResolveBaseAttack(Unit attacker, BaseController baseObject)
+    private void ApplyBaseDamage(Unit attacker)
     {
-        if (baseObject != null)
-        {
-            baseObject.TakeDamage(attacker.Power);
-        }
+        Debug.Log($"{attacker.name} が拠点を攻撃！ ダメージ: {attacker.CurrentPower}");
     }
 }

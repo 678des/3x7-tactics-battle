@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
     private void ExecuteBattle()
     {
         Debug.Log("バトル実行");
-        battleProcessor.ResolveAllBattles();
+        battleProcessor.ExecuteBattle();
         StartPhase(GamePhase.Spawn);
     }
 

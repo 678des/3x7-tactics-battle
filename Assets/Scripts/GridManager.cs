@@ -20,6 +20,7 @@ public class GridManager : MonoBehaviour
     private const int Cols = 3;
 
     public Quaternion cardRotation = Quaternion.Euler(0, 90f, 0);
+    private List<Unit> _allActiveUnits = new List<Unit>();
 
     [Header("Grid Settings")]
     [SerializeField, Tooltip("生成するマスのPrefab")]
@@ -30,6 +31,8 @@ public class GridManager : MonoBehaviour
 
     public Unit SelectedUnit { get; private set; }
     private Vector2Int _selectedUnitPos;
+
+    //全てのユニットを格納する
     private Dictionary<Unit, Vector2Int> _reservedMoves = new Dictionary<Unit, Vector2Int>();
 
     private void Awake()
@@ -111,7 +114,7 @@ public class GridManager : MonoBehaviour
         for (int i = 0; i < cardPrefabs.Count && i < availablePositions.Count; i++)
         {
 
-            SpawnUnit(cardPrefabs[i], availablePositions[i], cardRotation);
+            SpawnUnit(cardPrefabs[i], availablePositions[i], cardRotation, false);
         }
     }
 
@@ -129,7 +132,7 @@ public class GridManager : MonoBehaviour
 
 
 
-    public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation)
+    public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation, bool isPlayerOwned)
     {
         if (!IsValidCoordinate(pos.x, pos.y)) return;
         if (IsCellOccupied(pos)) return;
@@ -139,11 +142,21 @@ public class GridManager : MonoBehaviour
             GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
             Unit unit = obj.GetComponent<Unit>();
 
+            if (unit != null)
+            {
+                // ユニット側の所属フラグを設定
+                unit.IsPlayerOwned = isPlayerOwned; // ※小文字/大文字はUnit側の変数名に合わせて調整してください
+            }
+
             _grid[pos.x, pos.y] = unit;
 
+            // 全ユニット管理リストに追加
+            if (!_allActiveUnits.Contains(unit))
+            {
+                _allActiveUnits.Add(unit);
+            }
         }
     }
-
     public void PlaceUnit(Unit unit, int col, int row)
     {
         if (IsValidCoordinate(col, row))
@@ -160,15 +173,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public Unit GetUnitAt(int col, int row)
-    {
-        return IsValidCoordinate(col, row) ? _grid[col, row] : null;
-    }
 
-    public Unit GetUnitAt(Vector2Int pos)
-    {
-        return GetUnitAt(pos.x, pos.y);
-    }
 
     public bool TryMoveUnit(int fromCol, int fromRow, int toCol, int toRow)
     {
@@ -186,36 +191,7 @@ public class GridManager : MonoBehaviour
         return col >= 0 && col < Cols && row >= 0 && row < Rows;
     }
 
-    public List<Vector2Int> GetAvailableMoves(Unit unit, int currentCol, int currentRow)
-    {
-        List<Vector2Int> availableMoves = new List<Vector2Int>();
-        var movePattern = unit.MovePattern;
 
-        foreach (var offset in movePattern)
-        {
-            int targetCol = currentCol + offset.x;
-            int targetRow = currentRow + offset.y;
-
-            if (IsValidCoordinate(targetCol, targetRow) && _grid[targetCol, targetRow] == null && !_obstacles[targetCol, targetRow])
-            {
-                availableMoves.Add(new Vector2Int(targetCol, targetRow));
-            }
-        }
-
-        return availableMoves;
-    }
-
-    public List<Vector2Int> GetReachableTiles(Unit unit, Vector2Int currentPos)
-    {
-        return GetAvailableMoves(unit, currentPos.x, currentPos.y);
-    }
-
-    //public bool IsValidMove(Vector2Int targetPos)
-    //{
-    //    if (SelectedUnit == null) return false;
-    //    var available = GetAvailableMoves(SelectedUnit, _selectedUnitPos.x, _selectedUnitPos.y);
-    //    return available.Contains(targetPos);
-    //}
 
     public void SelectUnit(Unit unit)
     {
@@ -254,33 +230,22 @@ public class GridManager : MonoBehaviour
 
     public List<Unit> GetAllUnits()
     {
-        List<Unit> list = new List<Unit>();
-        for (int c = 0; c < Cols; c++)
-        {
-            for (int r = 0; r < Rows; r++)
-            {
-                if (_grid[c, r] != null)
-                {
-                    list.Add(_grid[c, r]);
-                }
-            }
-        }
-        return list;
+        _allActiveUnits.RemoveAll(unit => unit == null);
+        return new List<Unit>(_allActiveUnits);
     }
-
-    public List<Unit> GetAllUnitsByTeam(TeamType team)
+    public List<Unit> GetUnitsByTeam(bool isPlayerSide)
     {
         List<Unit> list = new List<Unit>();
-        bool targetIsPlayer = (team == TeamType.Player);
         foreach (var unit in GetAllUnits())
         {
-            if (unit.IsPlayerOwned == targetIsPlayer)
+            if (unit != null && unit.IsPlayerOwned == isPlayerSide)
             {
                 list.Add(unit);
             }
         }
         return list;
     }
+
 
     public Vector2Int GetUnitPosition(Unit unit)
     {
@@ -334,7 +299,7 @@ public class GridManager : MonoBehaviour
                 unit.transform.position = worldPos;
 
                 // 3. ユニット側が持っている現在地データがあればそれも更新
-                // unit.CurrentPosition = targetPos; 
+                unit.CurrentPosition = targetPos;
             }
         }
         _reservedMoves.Clear();
@@ -408,31 +373,21 @@ public class GridManager : MonoBehaviour
         _reservedMoves.Clear();
     }
 
-    /// <summary>
-    /// EnemyAIやBattleProcessorから呼び出しやすい、チーム別の全ユニット取得
-    /// </summary>
-    public List<Unit> GetUnitsByTeam(bool isPlayerSide)
+
+
+    public Unit GetUnitAtPosition(Vector2Int pos)
     {
-        List<Unit> list = new List<Unit>();
-        foreach (var unit in GetAllUnits())
+        // 場にいる全ユニットから、指定座標と一致するものを探す
+        List<Unit> allUnits = GetAllUnits();
+        foreach (var unit in allUnits)
         {
-            if (unit.IsPlayerOwned == isPlayerSide)
+            if (unit != null && unit.CurrentPosition == pos)
             {
-                list.Add(unit);
+                Debug.Log("見つかりました");
+                return unit; // 見つかったらそのユニットを返す
             }
         }
-        return list;
-    }
-
-    /// <summary>
-    /// 敵AIが移動先を選ぶ際に使用する「ユニットの移動可能マス（障害物や他のキャラを考慮しない純粋な移動範囲）」の取得
-    /// </summary>
-    public List<Vector2Int> GetMovableCells(Unit unit)
-    {
-        Vector2Int currentPos = GetUnitPosition(unit);
-        if (!IsValidCoordinate(currentPos.x, currentPos.y)) return new List<Vector2Int>();
-
-        return GetAvailableMoves(unit, currentPos.x, currentPos.y);
+        return null; // 誰もいなければnull
     }
 }
 
