@@ -16,8 +16,8 @@ public enum TeamType
 public class GridManager : MonoBehaviour
 {
     public static GridManager Instance;
-    private const int Rows = 7;
-    private const int Cols = 3;
+    public const int Rows = 7;
+    public const int Cols = 3;
 
     public Quaternion cardRotation = Quaternion.Euler(0, 90f, 0);
     private List<Unit> _allActiveUnits = new List<Unit>();
@@ -32,7 +32,7 @@ public class GridManager : MonoBehaviour
     public Unit SelectedUnit { get; private set; }
     private Vector2Int _selectedUnitPos;
 
-    //全てのユニットを格納する
+    //全てのユニットの移動予約場所
     private Dictionary<Unit, Vector2Int> _reservedMoves = new Dictionary<Unit, Vector2Int>();
 
     private void Awake()
@@ -208,7 +208,8 @@ public class GridManager : MonoBehaviour
 
     public void ReserveMove(Unit unit, Vector2Int targetPos)
     {
-        Debug.Log($"{targetPos}移動予約した");
+        if (GameManager.CurrentPhase != GameManager.GamePhase.MoveReservation) return;
+        Debug.Log($"{unit}{targetPos}移動予約した");
         if (_reservedMoves.ContainsKey(unit))
         {
             _reservedMoves[unit] = targetPos;
@@ -271,9 +272,10 @@ public class GridManager : MonoBehaviour
     }
     public void ProcessAllUnitMovements()
     {
-        Debug.Log($"すべてのユニット移動{_reservedMoves}");
         foreach (var kvp in _reservedMoves)
+
         {
+            Debug.Log($"{kvp}へ移動");
             Unit unit = kvp.Key;
             Vector2Int targetPos = kvp.Value;
             Vector2Int currentPos = GetUnitPosition(unit);

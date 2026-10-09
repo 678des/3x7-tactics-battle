@@ -5,11 +5,18 @@ using UnityEngine;
 /// 敵AIの思考と移動予約を管理するクラス。
 /// 一番近い味方のマスに向かって移動するロジックを実行する。
 /// </summary>
+/// // AIの「移動の候補」を1つにまとめるデータ入れ
+public struct AIMoveCandidate
+{
+    public Unit unit;         // 動かすキャラクター
+    public Vector2Int targetPos; // 移動先の座標
+    public float score;       // その評価値（点数）
+}
+
 public class EnemyAI : MonoBehaviour
 {
     [Header("Enemy Cost Settings")]
     [SerializeField] private int enemyCurrentCost = 3;
-    [SerializeField] private int enemyMaxCost = 3;
 
     [Header("References")]
     [SerializeField] private GridManager gridManager;
@@ -19,9 +26,6 @@ public class EnemyAI : MonoBehaviour
             gridManager = GetComponent<GridManager>();
     }
 
-    /// <summary>
-    /// 敵のスポーンフェーズを実行する処理（コストがある限り、奥の陣地にランダムでユニットを召喚する）
-    /// </summary>
     /// <summary>
     /// 敵のスポーンフェーズを実行する処理（コストがある限り、奥の陣地にランダムでユニットを召喚する）
     /// </summary>
@@ -74,7 +78,7 @@ public class EnemyAI : MonoBehaviour
             int randomCellIndex = Random.Range(0, availableSpawnCells.Count);
             Vector2Int spawnPos = availableSpawnCells[randomCellIndex];
 
-            Quaternion enemyRotation = Quaternion.Euler(0, -90f, 0);
+            Quaternion enemyRotation = Quaternion.Euler(-90, 0f, 0);
 
             gridManager.SpawnUnit(selectedCard.unitPrefab, spawnPos, enemyRotation, false);
 
@@ -86,62 +90,149 @@ public class EnemyAI : MonoBehaviour
         }
 
     }
+
+
     /// <summary>
-    /// 敵のターン（移動フェーズ開始時）に呼ばれ、全敵ユニットの移動先を決定・予約する。
+    /// フィールドにいるすべての敵の、すべての移動可能先を網羅してリストにして返す関数
     /// </summary>
-    public void ExecuteEnemyTurn()
+    public List<AIMoveCandidate> GetAllEnemyMoveCandidates()
     {
-        if (gridManager == null) return;
+        List<AIMoveCandidate> allCandidates = new List<AIMoveCandidate>();
+        if (gridManager == null) return allCandidates;
 
-        // 1. フィールド上の敵ユニットと味方ユニットのリストを取得
+        // 1. フィールド上のすべての敵ユニットのリストを取得
         List<Unit> enemyUnits = gridManager.GetUnitsByTeam(false);
-        List<Unit> playerUnits = gridManager.GetUnitsByTeam(true);
 
-        if (playerUnits.Count == 0 || enemyUnits.Count == 0)
-            return;
-
-
-        // 2. 各敵ユニットごとに移動先を決定
         foreach (var enemy in enemyUnits)
         {
+            if (enemy == null) continue;
+
+            // 敵の現在地を取得
             Vector2Int enemyPos = gridManager.GetUnitPosition(enemy);
             if (!gridManager.IsValidCoordinate(enemyPos.x, enemyPos.y)) continue;
 
-            // 一番近い味方ユニットを探す
-            Unit nearestPlayer = FindNearestUnit(enemyPos, playerUnits);
-            if (nearestPlayer != null)
+            // 2. この敵が移動できるマスのリストを取得する
+            List<Vector2Int> movableCells = enemy.GetMovalePositions(enemyPos);
+
+            // 3. 取得した移動先マスを、1つずつ構造体に詰めてリストに追加していく
+            foreach (var targetPos in movableCells)
             {
-                Vector2Int playerPos = gridManager.GetUnitPosition(nearestPlayer);
+                //すでに他のユニットがいるマス」を移動先から除外したい場合
+                //if (targetPos != enemyPos && gridManager.IsCellOccupied(targetPos)) continue;
 
-                // 移動可能な範囲から、一番「ターゲットに近づけるマス」を選んで予約
-                //Vector2Int bestMovePos = CalculateBestMove(enemy, enemyPos, playerPos);
 
-                //// GridManager側のメソッド名（ReserveMove）に合わせる
-                //gridManager.ReserveMove(enemy, bestMovePos);
+                AIMoveCandidate candidate = new AIMoveCandidate
+                {
+                    unit = enemy,
+                    targetPos = targetPos,
+                    score = 0f
+                };
+
+                allCandidates.Add(candidate);
             }
+        }
+
+        return allCandidates;
+    }
+
+
+    /// <summary>
+    /// 移動フェーズ開始時に呼ばれ、全敵の全移動候補を洗い出し、
+    /// スコア（評価値）を計算して最も良い移動先を予約する。
+    /// </summary>
+    public void ExecuteEnemyReservePhase()
+    {
+        if (gridManager == null) return;
+
+        // 1. すべての敵の移動候補（全敵の動ける全マス）をリストアップする
+        List<AIMoveCandidate> allCandidates = GetAllEnemyMoveCandidates();
+        if (allCandidates.Count == 0) return;
+
+        // 2. 「リストに入ったすべての候補に対して、スコア（評価値）を計算して代入する」
+        for (int i = 0; i < allCandidates.Count; i++)
+        {
+            AIMoveCandidate candidate = allCandidates[i];
+
+            // 評価関数を呼んでスコアを計算し、構造体に代入する
+            candidate.score = EvaluateCandidate(candidate);
+
+            // 構造体は値渡しなので、リストの要素を上書きして更新する
+            allCandidates[i] = candidate;
+        }
+
+        // 3. スコアが最も高い候補を1つだけ選ぶ（同値の場合は最初のもの）
+        AIMoveCandidate bestCandidate = allCandidates[0];
+        float highestScore = -9999f;
+
+        foreach (var candidate in allCandidates)
+        {
+            if (candidate.score > highestScore)
+            {
+                highestScore = candidate.score;
+                bestCandidate = candidate;
+            }
+        }
+
+        // 4. 選ばれた最善の移動先を GridManager に予約する
+        if (bestCandidate.unit != null)
+        {
+            gridManager.ReserveMove(bestCandidate.unit, bestCandidate.targetPos);
+            Debug.Log($"[敵AI] {bestCandidate.unit.name} が {bestCandidate.targetPos} への移動を予約しました。（評価スコア: {highestScore}）");
         }
     }
 
     /// <summary>
-    /// 指定された位置から最も近い味方ユニットを見つける
+    /// 1つの移動候補（AIMoveCandidate）に対する「評価値（点数）」を計算する関数
     /// </summary>
-    private Unit FindNearestUnit(Vector2Int fromPosition, List<Unit> targets)
+    private float EvaluateCandidate(AIMoveCandidate candidate)
     {
-        Unit nearest = null;
-        float minDistance = float.MaxValue;
+        float score = 0f;
+        Vector2Int pos = candidate.targetPos;
+        Unit enemyUnit = candidate.unit; // 動こうとしている敵ユニット自身
 
-        foreach (var target in targets)
+        // フィールド上のすべてのプレイヤー（味方）ユニットを取得
+        List<Unit> playerUnits = gridManager.GetUnitsByTeam(true);
+
+        if (playerUnits.Count == 0)
         {
-            Vector2Int targetPos = gridManager.GetUnitPosition(target);
-            float dist = Vector2Int.Distance(fromPosition, targetPos);
-            if (dist < minDistance)
+            // プレイヤーがいない場合は、とりあえず前進（yが小さくなる方向など）を評価
+            return -pos.y;
+        }
+
+        // ① 一番近いプレイヤーユニットとの距離を測る（近いほど高得点）
+        float minDistanceToPlayer = 999f;
+        Unit nearestPlayer = null;
+
+        foreach (var player in playerUnits)
+        {
+            if (player == null) continue;
+            Vector2Int playerPos = gridManager.GetUnitPosition(player);
+
+            // マンハッタン距離 (|x1 - x2| + |y1 - y2|)
+            float dist = Mathf.Abs(pos.x - playerPos.x) + Mathf.Abs(pos.y - playerPos.y);
+            if (dist < minDistanceToPlayer)
             {
-                minDistance = dist;
-                nearest = target;
+                minDistanceToPlayer = dist;
+                nearestPlayer = player; // 一番近い味方を記録しておく
             }
         }
-        return nearest;
+
+        // 基本スコア：プレイヤーに近づくほど高得点（例: 20から距離を引く）
+        score += (20f - minDistanceToPlayer);
+
+        // ②一番近いプレイヤーとの相性を判定して評価を調整する
+        if (nearestPlayer != null && enemyUnit != null)
+        {
+            // Unit側、あるいは BattleProcessor 側にある属性相性判定を呼び出す
+            int advantage = BattleProcessor.Instance.GetElementAdvantage(enemyUnit.Element, nearestPlayer.Element);
+
+            if (advantage < 0 && minDistanceToPlayer <= 1f) score -= 500f;
+            else if (advantage < 0) score -= 300f;
+            else if (advantage > 0) score += 15f;
+
+        }
+
+        Debug.Log($"{candidate.unit.name} が {pos} に移動した場合のスコア: {score}点");
+        return score;
     }
-
-
 }

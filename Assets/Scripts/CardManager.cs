@@ -4,13 +4,13 @@
 using UnityEngine;
 
 /// <summary>
-/// 手札の管理、コスト消費、カード効果の適用を行うマネージャークラス。
+/// 手札の管理、カード効果の適用を行うマネージャークラス。
 /// </summary>
 [RequireComponent(typeof(UnityEngine.Transform))]
 public class CardManager : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private int currentCost = 3;
+    //[SerializeField] private int currentCost = 3;
     [SerializeField] private int maxCost = 3;
 
     [Header("References")]
@@ -20,7 +20,7 @@ public class CardManager : MonoBehaviour
     private CardData selectedCard;
     private CardView selectedView;
 
-    public int CurrentCost => currentCost;
+    //public int CurrentCost => currentCost;
     public int MaxCost => maxCost;
 
     private void Awake()
@@ -29,10 +29,7 @@ public class CardManager : MonoBehaviour
             gridManager = GetComponent<GridManager>();
     }
 
-    public void ResetCost()
-    {
-        currentCost = maxCost;
-    }
+
 
     public void SelectCard(CardData card, CardView view)
     {
@@ -69,7 +66,7 @@ public class CardManager : MonoBehaviour
     {
         if (card == null) return false;
         Debug.Log("try!");
-        if (card != null && currentCost < card.cost)
+        if (card != null && GameManager.Instance.CurrentPlayerCost < card.cost)
         {
             Debug.LogWarning("コスト不足です。");
             return false;
@@ -81,7 +78,8 @@ public class CardManager : MonoBehaviour
                 if (!gridManager.IsCellOccupied(targetPosition))
                 {
                     Debug.Log("try!!");
-                    gridManager.SpawnUnit(card.unitPrefab, targetPosition, Quaternion.identity, true);
+
+                    gridManager.SpawnUnit(card.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), true);
                 }
                 else
                 {
@@ -98,24 +96,9 @@ public class CardManager : MonoBehaviour
                 break;
         }
 
-        currentCost -= card.cost;
+        GameManager.Instance.TryConsumeCost(TeamType.Player, card.cost);
         return true;
     }
 
-    //private void ApplyBuff(CardData card)
-    //{
-    //    var units = gridManager.GetAllUnits();
-    //    foreach (var unit in units)
-    //    {
-    //        if (unit.isPlayerSide)
-    //        {
-    //            unit.ApplyBuff(card.powerModifier);
-    //        }
-    //    }
-    //}
 
-    //private void ApplyDebuff(CardData card, Vector2Int targetPosition)
-    //{
-    //    gridManager.SetCellObstacle(targetPosition, true);
-    //}
 }

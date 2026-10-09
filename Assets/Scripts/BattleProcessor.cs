@@ -3,6 +3,11 @@ using UnityEngine;
 
 public class BattleProcessor : MonoBehaviour
 {
+    public static BattleProcessor Instance { get; private set; }
+    private void Awake()
+    {
+        Instance = this;
+    }
     public void ExecuteBattle()
     {
         // 1. 場にいるすべてのユニットを取得
@@ -39,15 +44,10 @@ public class BattleProcessor : MonoBehaviour
                     break;
                 }
 
-                // 拠点に届いているかチェック（例：プレイヤーなら行6、敵なら行0）
-                if (attacker.IsPlayerOwned && pos.y >= 6)
-                {
-                    isInBaseRange = true;
-                }
-                else if (!attacker.IsPlayerOwned && pos.y <= 0)
-                {
-                    isInBaseRange = true;
-                }
+                // 拠点に届いているかチェック（例：プレイヤーなら行7、敵なら行-1）
+                if (attacker.IsPlayerOwned && pos.y >= GridManager.Rows) isInBaseRange = true;
+                else if (!attacker.IsPlayerOwned && pos.y <= -1) isInBaseRange = true;
+
             }
 
             // 4. 判定・処理の実行
@@ -57,7 +57,10 @@ public class BattleProcessor : MonoBehaviour
             }
             else if (isInBaseRange)
             {
-                ApplyBaseDamage(attacker);
+                if (attacker.IsPlayerOwned) GameManager.Instance.DamageBase(TeamType.Enemy, attacker.CurrentPower);
+                else GameManager.Instance.DamageBase(TeamType.Player, attacker.CurrentPower);
+
+                Debug.Log($"{attacker.name} が拠点を攻撃！ ダメージ: {attacker.CurrentPower}");
             }
         }
 
@@ -100,8 +103,8 @@ public class BattleProcessor : MonoBehaviour
         }
     }
 
-    // 属性のじゃんけん判定をする関数（例）
-    private int GetElementAdvantage(Unit.ElementType attackerElement, Unit.ElementType defenderElement)
+    // 属性のじゃんけん判定をする関数
+    public int GetElementAdvantage(Unit.ElementType attackerElement, Unit.ElementType defenderElement)
     {
         // 例: Water(水) > Fire(火) > Wood(木) > Water(水)
         if (attackerElement == Unit.ElementType.Water && defenderElement == Unit.ElementType.Fire) return 1;
@@ -113,11 +116,8 @@ public class BattleProcessor : MonoBehaviour
         if (attackerElement == Unit.ElementType.Grass && defenderElement == Unit.ElementType.Fire) return -1;
         if (attackerElement == Unit.ElementType.Water && defenderElement == Unit.ElementType.Grass) return -1;
 
-        return 0; // 同属性など
+        return 0; // 同属性の場合
     }
 
-    private void ApplyBaseDamage(Unit attacker)
-    {
-        Debug.Log($"{attacker.name} が拠点を攻撃！ ダメージ: {attacker.CurrentPower}");
-    }
+
 }

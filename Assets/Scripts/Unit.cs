@@ -29,6 +29,7 @@ public class Unit : MonoBehaviour
     [Tooltip("移動できるマスの相対座標リスト")]
     public List<Vector2Int> MovePattern = new List<Vector2Int>
     {
+        new Vector2Int(0,0),
         new Vector2Int( 0,  1), // 上
         new Vector2Int( 0, -1), // 下
         new Vector2Int( 1,  0), // 右
@@ -42,6 +43,7 @@ public class Unit : MonoBehaviour
     [Tooltip("攻撃できるマスの相対座標リスト")]
     public List<Vector2Int> AttackPattern = new List<Vector2Int>
     {
+        new Vector2Int(0,0),
         new Vector2Int( 0,  1), // 上
         new Vector2Int( 0, -1), // 下
         new Vector2Int( 1,  0), // 右
@@ -69,7 +71,27 @@ public class Unit : MonoBehaviour
 
         return result;
     }
+    public List<Vector2Int> GetMovalePositions(Vector2Int currentPos)
+    {
+        List<Vector2Int> result = new List<Vector2Int>();
 
+        foreach (var offset in MovePattern)
+        {
+            Vector2Int targetPos = currentPos + offset;
+            if (targetPos.y >= GridManager.Rows || targetPos.x >= GridManager.Cols) continue;
+            result.Add(targetPos);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 指定した位置（myPos）にいるとき、相手の位置（targetPos）を攻撃できるか？
+    /// </summary>
+    public bool CanAttackTarget(Vector2Int myPos, Vector2Int targetPos)
+    {
+        List<Vector2Int> attackableCells = GetAttackablePositions(myPos);
+        return attackableCells.Contains(targetPos);
+    }
     private void OnMouseDown()
     {
         if (!IsPlayerOwned)
