@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 849460882035137268}
   - component: {fileID: -2247873795825100034}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Akazukin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -127,8 +127,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f701141dbf4b3244d864fa79f92e2ca9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
-  isPlayerOwned: 1
-  movePattern:
-  - {x: 0, y: 1}
   element: 0
-  power: 10
+  power: 1000000
+  IsPlayerOwned: 1
+  MovePattern:
+  - {x: 0, y: 1}
+  - {x: 0, y: -1}
+  - {x: 1, y: 0}
+  - {x: -1, y: 0}
+  - {x: 1, y: 1}
+  - {x: -1, y: 1}
+  - {x: 1, y: -1}
+  - {x: -1, y: -1}
+  AttackPattern:
+  - {x: 0, y: 1}
+  - {x: 0, y: -1}
+  - {x: 1, y: 0}
+  - {x: -1, y: 0}
+  - {x: 1, y: 1}
+  - {x: -1, y: 1}
+  - {x: 1, y: -1}
+  - {x: -1, y: -1}

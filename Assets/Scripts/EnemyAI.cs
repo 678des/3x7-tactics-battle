@@ -44,11 +44,6 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        if (availableSpawnCells.Count > 0)
-        {
-            Debug.Log($"{availableSpawnCells[0]}スポーン可能範囲");
-        }
-
         // 簡易AIのスポーンループ
         while (enemyCurrentCost > 0 && availableSpawnCells.Count > 0)
         {
@@ -76,14 +71,11 @@ public class EnemyAI : MonoBehaviour
             // ランダムにカードと空きマスを選ぶ
             int randomCardIndex = Random.Range(0, affordableSummonCards.Count);
             CardData selectedCard = affordableSummonCards[randomCardIndex];
-
             int randomCellIndex = Random.Range(0, availableSpawnCells.Count);
             Vector2Int spawnPos = availableSpawnCells[randomCellIndex];
 
             Quaternion enemyRotation = Quaternion.Euler(0, -90f, 0);
 
-            // 💡 修正ポイント：SpawnUnitの引数に `false`（敵チーム）を渡すことで、
-            //    自動的に「グリッド配置」「リスト登録」「敵所属の設定」が一度に行われます。
             gridManager.SpawnUnit(selectedCard.unitPrefab, spawnPos, enemyRotation, false);
 
             // コストを消費し、選んだマスをリストから削除

@@ -75,19 +75,45 @@ public class BattleProcessor : MonoBehaviour
 
     private void ResolveCombat(Unit attacker, Unit defender, List<Unit> destroyList)
     {
-        if (attacker.CurrentPower > defender.CurrentPower)
+        // 1. 属性の相性をチェックする（例：水は火に強い、火は草に強い、草は水に強い）
+        int attackerAdvantage = GetElementAdvantage(attacker.Element, defender.Element);
+        // 1: 攻撃側が有利, -1: 攻撃側が不利, 0: 互角（相性なし）
+
+        // 2. 「パワー ＋ 属性補正」で最終的な戦闘力を計算する
+        // ※ 属性が有利なら、パワーに +5 などのボーナスを与える（これなら 10 vs 10 でも水が勝つ！）
+        int attackerFinalPower = attacker.CurrentPower + (attackerAdvantage * 5);
+        int defenderFinalPower = defender.CurrentPower - (attackerAdvantage * 5); // 相手の補正
+
+        if (attackerFinalPower > defenderFinalPower)
         {
-            destroyList.Add(defender);
+            destroyList.Add(defender); // 攻撃側の勝ち（防御側を破壊）
         }
-        else if (attacker.CurrentPower < defender.CurrentPower)
+        else if (attackerFinalPower < defenderFinalPower)
         {
-            destroyList.Add(attacker);
+            destroyList.Add(attacker); // 防御側の勝ち（攻撃側を破壊）
         }
         else
         {
+            // パワーも相性も完全に互角の場合のみ相打ち
             destroyList.Add(attacker);
             destroyList.Add(defender);
         }
+    }
+
+    // 属性のじゃんけん判定をする関数（例）
+    private int GetElementAdvantage(Unit.ElementType attackerElement, Unit.ElementType defenderElement)
+    {
+        // 例: Water(水) > Fire(火) > Wood(木) > Water(水)
+        if (attackerElement == Unit.ElementType.Water && defenderElement == Unit.ElementType.Fire) return 1;
+        if (attackerElement == Unit.ElementType.Fire && defenderElement == Unit.ElementType.Grass) return 1;
+        if (attackerElement == Unit.ElementType.Grass && defenderElement == Unit.ElementType.Water) return 1;
+
+        // 逆に負けている場合
+        if (attackerElement == Unit.ElementType.Fire && defenderElement == Unit.ElementType.Water) return -1;
+        if (attackerElement == Unit.ElementType.Grass && defenderElement == Unit.ElementType.Fire) return -1;
+        if (attackerElement == Unit.ElementType.Water && defenderElement == Unit.ElementType.Grass) return -1;
+
+        return 0; // 同属性など
     }
 
     private void ApplyBaseDamage(Unit attacker)

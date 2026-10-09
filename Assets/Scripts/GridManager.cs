@@ -137,25 +137,16 @@ public class GridManager : MonoBehaviour
         if (!IsValidCoordinate(pos.x, pos.y)) return;
         if (IsCellOccupied(pos)) return;
 
-        if (unitPrefab != null)
-        {
-            GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
-            Unit unit = obj.GetComponent<Unit>();
 
-            if (unit != null)
-            {
-                // ユニット側の所属フラグを設定
-                unit.IsPlayerOwned = isPlayerOwned; // ※小文字/大文字はUnit側の変数名に合わせて調整してください
-            }
+        GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
+        Unit unit = obj.GetComponent<Unit>();
+        if (!unit) return;
+        unit.IsPlayerOwned = isPlayerOwned;
+        unit.CurrentPosition = pos;
+        _grid[pos.x, pos.y] = unit;
+        if (!_allActiveUnits.Contains(unit)) _allActiveUnits.Add(unit);
 
-            _grid[pos.x, pos.y] = unit;
 
-            // 全ユニット管理リストに追加
-            if (!_allActiveUnits.Contains(unit))
-            {
-                _allActiveUnits.Add(unit);
-            }
-        }
     }
     public void PlaceUnit(Unit unit, int col, int row)
     {
@@ -292,13 +283,8 @@ public class GridManager : MonoBehaviour
                 // 1. グリッドのデータを更新
                 _grid[currentPos.x, currentPos.y] = null;
                 _grid[targetPos.x, targetPos.y] = unit;
-
-                // 2. 実際の3Dオブジェクトの位置を移動させる
-                // ※ GridManager側にある「グリッド座標をワールド座標に変換する関数」を使ってください
                 Vector3 worldPos = GridToWorldPosition(targetPos);
                 unit.transform.position = worldPos;
-
-                // 3. ユニット側が持っている現在地データがあればそれも更新
                 unit.CurrentPosition = targetPos;
             }
         }
