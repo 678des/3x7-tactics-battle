@@ -127,15 +127,6 @@ public class GridManager : MonoBehaviour
     }
 
 
-    //public bool CanPlaceUnit(int col, int row)
-    //{
-    //    if (!IsValidCoordinate(col, row)) return false;
-    //    return _grid[col, row] == null && !_obstacles[col, row];
-    //}
-
-
-
-
 
     public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation, bool isPlayerOwned)
     {

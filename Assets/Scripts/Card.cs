@@ -9,44 +9,40 @@ using UnityEngine;
 public class Card : MonoBehaviour
 {
     [SerializeField] private CardData cardData;
-    private CardManager cardManager;
 
-    private bool isSelected = false;
-
-    private Vector3 originalPosition = new Vector3(0, 0.3f, -0.4f);
+    private Vector3 originalPosition = new();
     public CardData CardData => cardData;
 
     private void Awake()
     {
-        //originalPosition = transform.localPosition;
-        //transform.rotation = originalQuaternion;
+        originalPosition = transform.localPosition;
+    }
+    private void OnEnable()
+    {
+        originalPosition = transform.localPosition;
     }
 
-    private void Start()
-    {
-        cardManager = FindAnyObjectByType<CardManager>();
-    }
 
 
     public void SetSelected(bool selected)
     {
-        isSelected = selected;
 
-        if (isSelected)
+        if (selected)
         {
-            CardManager.currentPlayerSelectedCard = this;
-            transform.localPosition += new Vector3(0f, 1, 0f);
-        }
-        else transform.localPosition = originalPosition;
 
+            CardManager.currentPlayerSelectedCard = this;
+            transform.localPosition = new Vector3(transform.localPosition.x, 0.6f, transform.localPosition.z);
+        }
+        else
+        {
+            CardManager.currentPlayerSelectedCard = null;
+            transform.localPosition = originalPosition;
+        }
     }
 
 
     private void OnMouseDown()
     {
-        Debug.Log(gameObject.name + " がクリックされました！");
-        SetSelected(true);
-
-
+        CardManager.Instance.AllCardViewController(this);
     }
 }

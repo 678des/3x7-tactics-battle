@@ -18,7 +18,7 @@ public class CardManager : MonoBehaviour
 
 
     [Header("Hand / UI Settings")]
-    [SerializeField] private Vector3 handOffset = new Vector3(0, 0.3f, -0.4f);
+    public Vector3 handOffset = new Vector3(0, 0.3f, -0.4f);
     private Quaternion handRotation = Quaternion.Euler(0, 90, 30);
 
     //現在味方が選択しているカード
@@ -52,7 +52,7 @@ public class CardManager : MonoBehaviour
         for (int i = 0; i < cardPrefabs.Count; i++)
         {
             if (cardPrefabs[i] == null) continue;
-            Vector3 spawnPos = handOffset + new Vector3(i * 1.5f, 0, team == TeamType.Player ? 0 : 7f); // 味方と敵で少し位置を分ける例
+            Vector3 spawnPos = handOffset + new Vector3(i * 0.7f, 0, team == TeamType.Player ? 0 : 7f); // 味方と敵で少し位置を分ける例
             Instantiate(cardPrefabs[i], spawnPos, handRotation, parent);
         }
     }
@@ -122,5 +122,30 @@ public class CardManager : MonoBehaviour
         }
 
         return cardlist;
+    }
+
+
+    public void AllCardViewController(Card _card)
+    {
+        if (_card == null) return;
+
+        // 1.すでに選択されているカードをもう一度押したら沈ませる
+        if (_card == currentPlayerSelectedCard)
+        {
+            _card.SetSelected(false);
+            currentPlayerSelectedCard = null;
+            return;
+        }
+
+        // 2. 「新しい別のカードを押した」場合
+        // まず、プレイヤーのカードボックスにあるすべてのカードを一度沈める
+        foreach (Transform obj in playerCardBox)
+        {
+            Card card = obj.GetComponent<Card>();
+            if (card == null) continue;
+            card.SetSelected(false);
+        }
+        _card.SetSelected(true);
+        currentPlayerSelectedCard = _card;
     }
 }
