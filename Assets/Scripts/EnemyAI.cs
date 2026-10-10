@@ -22,8 +22,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private GridManager gridManager;
     private void Awake()
     {
-        if (gridManager == null)
-            gridManager = GetComponent<GridManager>();
+        gridManager = FindFirstObjectByType<GridManager>();
     }
 
     /// <summary>
@@ -31,6 +30,7 @@ public class EnemyAI : MonoBehaviour
     /// </summary>
     public void ExecuteEnemySpawnPhase()
     {
+        Debug.Log("スポーン的フェーズ");
         List<Vector2Int> availableSpawnCells = new List<Vector2Int>();
         Vector2Int decidePos = new Vector2Int(-1, -1);
         // 奥の陣地（例: 行 4, 5, 6）の空きマスを探索し、ランダムに1つ選ぶ
@@ -43,7 +43,7 @@ public class EnemyAI : MonoBehaviour
         }
         if (availableSpawnCells.Count <= 0) return;
         decidePos = availableSpawnCells[0];
-
+        Debug.Log("いｍから");
         List<Card> canUseCards = new List<Card>();
         // 使えるコスト以下の召喚カードを洗い出す
         foreach (GameObject card in CardManager.Instance.GetEnemyHandCards())
@@ -52,20 +52,19 @@ public class EnemyAI : MonoBehaviour
             if (newCard.CardData.cost <= enemyCurrentCost) canUseCards.Add(newCard);
         }
 
-        Card selectedCard = null;
-
+        Debug.Log($"いｍからカード{canUseCards.Count}");
         // 1. 1つを選ぶ(ユニットが1体もいない場合は、スペルカードを使わない)
         foreach (Card cardObj in canUseCards)
         {
-            if (gridManager.GetAllUnitPositionsByTeam(TeamType.Enemy).Count == 0 && cardObj.CardData.type != CardType.Summon) continue;
-            selectedCard = cardObj;
+
+            Debug.Log("いｍからカード");
+            if (gridManager.GetUnitsByTeam(false).Count == 0 && cardObj.CardData.type != CardType.Summon) continue;
+
+            Debug.Log("いｍからカードつかうで");
+            CardManager.Instance.UseCard(decidePos, cardObj, false);
             break;
         }
 
-        Debug.Log($"選択されたカード{selectedCard}");
-
-        if (selectedCard == null) return;
-        CardManager.Instance.UseCard(decidePos, selectedCard, false);
 
     }
 
@@ -117,9 +116,12 @@ public class EnemyAI : MonoBehaviour
     {
         if (gridManager == null) return;
 
+        Debug.Log("移動候補を");
         // 1. すべての敵の移動候補（全敵の動ける全マス）をリストアップする
         List<AIMoveCandidate> allCandidates = GetAllEnemyMoveCandidates();
         if (allCandidates.Count == 0) return;
+
+        Debug.Log("移動候補をリストアップ");
 
         // 2. 「リストに入ったすべての候補に対して、スコア（評価値）を計算して代入する」
         for (int i = 0; i < allCandidates.Count; i++)
@@ -149,7 +151,7 @@ public class EnemyAI : MonoBehaviour
         // 4. 選ばれた最善の移動先を GridManager に予約する
         if (bestCandidate.unit != null)
         {
-            gridManager.ReserveMove(bestCandidate.unit, bestCandidate.targetPos);
+            gridManager.ReserveMove(bestCandidate.unit, bestCandidate.targetPos, false);
             Debug.Log($"[敵AI] {bestCandidate.unit.name} が {bestCandidate.targetPos} への移動を予約しました。（評価スコア: {highestScore}）");
         }
     }

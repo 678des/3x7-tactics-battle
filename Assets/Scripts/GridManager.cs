@@ -10,9 +10,7 @@ public enum TeamType
 /// <summary>
 /// 3x7のグリッド管理クラス。
 /// マスのデータ保持、キャラクターの配置管理、移動判定、およびプレハブによる初期マス生成を行う。
-/// このスクリプトは、グリッドの原点となる空のGameObjectにアタッチしてください。
 /// </summary>
-[RequireComponent(typeof(UnityEngine.Transform))]
 public class GridManager : MonoBehaviour
 {
     public static GridManager Instance;
@@ -26,22 +24,82 @@ public class GridManager : MonoBehaviour
     [SerializeField, Tooltip("生成するマスのPrefab")]
     private GameObject cellPrefab;
 
+    [Header("Selection Ring Settings")]
+    [SerializeField] private Transform _sharedSelectionRingTransform; // シーン上にある唯一のリングのTransform
+    [SerializeField] private Vector3 _hiddenPosition = new Vector3(0, -999f, 0); // 非選択時の退避場所
+
     private Unit[,] _grid = new Unit[Cols, Rows];
     private bool[,] _obstacles = new bool[Cols, Rows];
 
     public Unit SelectedUnit { get; private set; }
-    private Vector2Int _selectedUnitPos;
 
-    //全てのユニットの移動予約場所
-    private Dictionary<Unit, Vector2Int> _reservedMoves = new Dictionary<Unit, Vector2Int>();
+    [Header("Indicator Settings")]
+    [SerializeField] private GameObject _movableIndicatorPrefab; // インジケーターのプレハブ
+    [SerializeField] private GameObject _movableIndicatorDecidededPrefab; // インジケーターの移動が予約できた時のプレハブ
+    [SerializeField] private int _poolSize = 10;                // 同時に表示する最大数（移動力に合わせる）
+
+    private List<Transform> _indicatorPool = new List<Transform>();
+
+    public (Vector2Int reservePos, Unit unit) playerUnitMoveOder;
+    public (Vector2Int reservePos, Unit unit) enemyUnitMoveOder;
+
 
     private void Awake()
     {
         Instance = this;
+
     }
     private void Start()
     {
         GenerateGridCubes();
+        HideSelectionRing();
+        InitializeIndicatorPool();
+    }
+
+    /// <summary>
+    /// あらかじめ指定数のインジケーターを生成して、隠し場所へ飛ばしておく
+    /// </summary>
+    private void InitializeIndicatorPool()
+    {
+        if (_movableIndicatorPrefab == null) return;
+
+        for (int i = 0; i < _poolSize; i++)
+        {
+            GameObject obj = Instantiate(_movableIndicatorPrefab, _hiddenPosition, Quaternion.identity);
+            obj.name = $"MovableIndicator_{i}";
+            // GridManagerの子にしておく
+            obj.transform.SetParent(this.transform);
+            _indicatorPool.Add(obj.transform);
+        }
+    }
+
+    public void ShowMovableRangeIndicator(List<Vector2Int> movableCoords)
+    {
+        HideAllMovableIndicators();
+
+        if (movableCoords == null || movableCoords.Count == 0) return;
+
+        // 2. リストの数（またはプール数）だけ、インジケーターを移動させる
+        for (int i = 0; i < movableCoords.Count && i < _indicatorPool.Count; i++)
+        {
+            Transform indicator = _indicatorPool[i];
+            Vector2Int coord = movableCoords[i];
+            Vector3 worldPos = GridToWorldPosition(coord);
+            worldPos.y += 0.1f;
+
+            indicator.position = worldPos;
+        }
+    }
+
+    public void HideAllMovableIndicators()
+    {
+        foreach (Transform indicator in _indicatorPool)
+        {
+            if (indicator != null)
+            {
+                indicator.position = _hiddenPosition;
+            }
+        }
     }
 
     /// <summary>
@@ -72,9 +130,6 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 指定されたチームの陣地に、手持ちのカードプレハブ群を均等に配置する
-    /// </summary>
 
     public bool CanPlaceUnit(int col, int row)
     {
@@ -92,9 +147,6 @@ public class GridManager : MonoBehaviour
 
     public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation, bool isPlayerOwned)
     {
-        //if (!IsValidCoordinate(pos.x, pos.y)) return;
-        //if (IsCellOccupied(pos)) return;
-
 
         GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
         Unit unit = obj.GetComponent<Unit>();
@@ -145,37 +197,47 @@ public class GridManager : MonoBehaviour
     public void SelectUnit(Unit unit)
     {
         SelectedUnit = unit;
-        Debug.Log($"{unit}選択した");
-        for (int c = 0; c < Cols; c++)
-        {
-            for (int r = 0; r < Rows; r++)
-            {
-                if (_grid[c, r] == unit)
-                {
-                    _selectedUnitPos = new Vector2Int(c, r);
-                    return;
-                }
-            }
-        }
+        List<Vector2Int> range = unit.GetMovalePositions(unit.CurrentPosition);
+        ShowMovableRangeIndicator(range);
+        MoveRingToPosition(GetUnitPosition(unit));
+
     }
 
     public void DeselectUnit()
     {
         SelectedUnit = null;
+        playerUnitMoveOder = (default, null);
+        _movableIndicatorDecidededPrefab.transform.position = _hiddenPosition;
+        HideSelectionRing();
+        HideAllMovableIndicators();
+    }
+    private void MoveRingToPosition(Vector2Int gridPos)
+    {
+        if (_sharedSelectionRingTransform != null)
+        {
+            Vector3 worldPos = GridToWorldPosition(gridPos);
+            worldPos.y += 0.2f;
+            _sharedSelectionRingTransform.position = worldPos;
+        }
+    }
+    private void HideSelectionRing()
+    {
+        if (_sharedSelectionRingTransform != null)
+        {
+            _sharedSelectionRingTransform.position = _hiddenPosition;
+        }
     }
 
-    public void ReserveMove(Unit unit, Vector2Int targetPos)
+    public void ReserveMove(Unit unit, Vector2Int targetPos, bool isPlayerOwned)
     {
-        if (GameManager.CurrentPhase != GameManager.GamePhase.MoveReservation || unit == null) return;
-        Debug.Log($"{unit}{targetPos}移動予約した");
-        if (_reservedMoves.ContainsKey(unit))
+        if (GameManager.CurrentPhase != GameManager.GamePhase.MoveReservation || unit == null || SelectedUnit == null) return;
+        if (isPlayerOwned)
         {
-            _reservedMoves[unit] = targetPos;
+            playerUnitMoveOder = (targetPos, unit);
+            _movableIndicatorDecidededPrefab.transform.position = new Vector3(targetPos.x, 0.11f, targetPos.y);
         }
-        else
-        {
-            _reservedMoves.Add(unit, targetPos);
-        }
+        else enemyUnitMoveOder = (targetPos, unit);
+
     }
 
     public List<Unit> GetAllUnits()
@@ -228,28 +290,41 @@ public class GridManager : MonoBehaviour
         }
         return list;
     }
+    /// <summary>
+    /// プレイヤーと敵の移動予約を実際に実行し、位置を更新する
+    /// </summary>
     public void ProcessAllUnitMovements()
     {
-        foreach (var kvp in _reservedMoves)
-
-        {
-            Debug.Log($"{kvp}へ移動");
-            Unit unit = kvp.Key;
-            Vector2Int targetPos = kvp.Value;
-            Vector2Int currentPos = GetUnitPosition(unit);
-
-            if (IsValidCoordinate(currentPos.x, currentPos.y) && IsValidCoordinate(targetPos.x, targetPos.y))
-            {
-                // 1. グリッドのデータを更新
-                _grid[currentPos.x, currentPos.y] = null;
-                _grid[targetPos.x, targetPos.y] = unit;
-                Vector3 worldPos = GridToWorldPosition(targetPos);
-                unit.transform.position = worldPos;
-                unit.CurrentPosition = targetPos;
-            }
-        }
-        _reservedMoves.Clear();
+        Debug.Log("すべてのユニットの移動処理を実行します。");
+        ExecuteMovementOrder(playerUnitMoveOder);
+        ExecuteMovementOrder(enemyUnitMoveOder);
+        playerUnitMoveOder = (default, null);
+        enemyUnitMoveOder = (default, null);
+        DeselectUnit();
     }
+
+    /// <summary>
+    /// 個別の移動予約を処理するヘルパーメソッド
+    /// </summary>
+    private void ExecuteMovementOrder((Vector2Int reservePos, Unit unit) order)
+    {
+        if (order.unit == null) return;
+
+        Vector2Int targetPos = order.reservePos;
+        Vector2Int currentPos = GetUnitPosition(order.unit);
+
+        // 現在地と移動先の座標が両方とも有効かチェック
+        if (IsValidCoordinate(currentPos.x, currentPos.y) && IsValidCoordinate(targetPos.x, targetPos.y))
+        {
+            _grid[currentPos.x, currentPos.y] = null;
+            _grid[targetPos.x, targetPos.y] = order.unit;
+            Vector3 worldPos = GridToWorldPosition(targetPos);
+            order.unit.transform.position = worldPos;
+            order.unit.CurrentPosition = targetPos;
+            Debug.Log($"{order.unit.name} を {currentPos} から {targetPos} へ移動しました。");
+        }
+    }
+
     public void SetCellObstacle(Vector2Int pos, bool isObstacle)
     {
         if (IsValidCoordinate(pos.x, pos.y))
@@ -268,8 +343,6 @@ public class GridManager : MonoBehaviour
                 _obstacles[c, r] = false;
             }
         }
-        _reservedMoves.Clear();
-        Debug.Log($"すべてのユニット移動完了");
     }
     /// <summary>
     /// グリッド座標 (Vector2Int) をワールド座標 (Vector3) に変換する
@@ -287,37 +360,8 @@ public class GridManager : MonoBehaviour
         int x = Mathf.RoundToInt(worldPos.x);
         int y = Mathf.RoundToInt(worldPos.z);
         return new Vector2Int(x, y);
-    }// ==========================================
-    // 追加・補強が必要なメソッド群
-    // ==========================================
-
-    /// <summary>
-    /// 指定されたユニットの移動予約先を取得する
-    /// </summary>
-    public Vector2Int? GetReservedMove(Unit unit)
-    {
-        if (_reservedMoves.ContainsKey(unit))
-        {
-            return _reservedMoves[unit];
-        }
-        return null;
     }
 
-    /// <summary>
-    /// 現在予約されているすべての移動リストを外部（GameManagerやBattleProcessorなど）から参照できるようにする
-    /// </summary>
-    public Dictionary<Unit, Vector2Int> GetAllReservedMoves()
-    {
-        return _reservedMoves;
-    }
-
-    /// <summary>
-    /// 移動予約をクリアする
-    /// </summary>
-    public void ClearReservedMoves()
-    {
-        _reservedMoves.Clear();
-    }
 
 
 

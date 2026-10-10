@@ -6,7 +6,6 @@ using UnityEngine;
 /// <summary>
 /// 手札のカードのビジュアル表示と選択状態を管理するクラス。
 /// </summary>
-[RequireComponent(typeof(CardData))]
 public class Card : MonoBehaviour
 {
     [SerializeField] private CardData cardData;

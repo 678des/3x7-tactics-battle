@@ -12,6 +12,16 @@ public class Unit : MonoBehaviour
     [Header("Unit Status")]
     [SerializeField] private ElementType element = ElementType.Fire;
     [SerializeField] private int power = 10;
+    private Material _materialInstance;
+
+    [Header("Visual Settings")]
+    [SerializeField] private MeshRenderer _unitMesh;
+    private bool _isSelected = false;
+
+    //[SerializeField] private Color _selectionColor = Color.cyan;
+    //private float _minIntensity = 0f;
+    //private float _maxIntensity = 1.0f;
+    //private float _pulseSpeed = 4.0f; // 点滅の速さ
 
     public bool IsPlayerOwned = true;
     public ElementType Element => element;
@@ -54,6 +64,57 @@ public class Unit : MonoBehaviour
         new Vector2Int(-1, -1)  // 左下
     };
 
+    [Header("Visual Settings")]
+    [SerializeField] private Material _defaultMaterial;   // 通常時のマテリアル
+    [SerializeField] private Material _selectedMaterial;  // 選択時の光るマテリアル
+
+    private void Awake()
+    {
+
+        if (_unitMesh == null) _unitMesh = GetComponent<MeshRenderer>();
+        if (_unitMesh != null) _materialInstance = _unitMesh.material;
+
+    }
+    private void Update()
+    {
+        //// 選択されている間、毎フレーム発光の強さを脈動させる
+        //if (_isSelected && _materialInstance != null)
+        //{
+        //    // サイン波を使って強度を滑らかに往復させる (-1〜1 を 0〜1 に変換しつつ倍率調整)
+        //    float t = (Mathf.Sin(Time.time * _pulseSpeed) + 1f) / 2f;
+        //    float currentIntensity = Mathf.Lerp(_minIntensity, _maxIntensity, t);
+
+        //    _materialInstance.SetColor("_EmissionColor", _selectionColor * currentIntensity);
+        //}
+    }
+
+
+    /// <summary>
+    /// このユニットが選択されたかどうかに応じて、見た目を更新する。
+    /// GridManagerから呼び出される。
+    /// </summary>
+    /// <param name="isSelected">選択された場合はtrue, そうでない場合はfalse</param>
+    public void SetSelectionState(bool isSelected)
+    {
+        if (_unitMesh != null && _selectedMaterial != null && _defaultMaterial != null)
+        {
+            _isSelected = isSelected;
+            //if (_materialInstance == null) return;
+
+            //if (_isSelected)
+            //{
+            //    _materialInstance.EnableKeyword("_EMISSION");
+            //    _materialInstance.SetColor("_EmissionColor", _selectionColor * _maxIntensity);
+            //}
+            //else
+            //{
+            //    _materialInstance.DisableKeyword("_EMISSION");
+            //    _materialInstance.SetColor("_EmissionColor", Color.black);
+            //}
+        }
+    }
+
+
     public void ClearDestination()
     {
         PlannedDestination = null;
@@ -78,7 +139,7 @@ public class Unit : MonoBehaviour
         foreach (var offset in MovePattern)
         {
             Vector2Int targetPos = currentPos + offset;
-            if (targetPos.y >= GridManager.Rows || targetPos.x >= GridManager.Cols) continue;
+            if (targetPos.y >= GridManager.Rows || targetPos.x >= GridManager.Cols || targetPos.y < 0 || targetPos.x < 0) continue;
             result.Add(targetPos);
         }
         return result;
@@ -94,16 +155,21 @@ public class Unit : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        if (!IsPlayerOwned)
+        if (!IsPlayerOwned || GameManager.CurrentPhase != GameManager.GamePhase.MoveReservation) return;
+        //もう一度クリックしたら削除
+        if (GridManager.Instance.SelectedUnit == this)
         {
+            GridManager.Instance.DeselectUnit();
             return;
         }
-
-        Debug.Log($"{gameObject.name} がクリックされました。");
-
-        if (GridManager.Instance != null)
+        else
         {
+
             GridManager.Instance.SelectUnit(this);
         }
+
+
+
+
     }
 }

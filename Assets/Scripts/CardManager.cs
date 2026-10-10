@@ -10,8 +10,8 @@ public class CardManager : MonoBehaviour
     private GridManager gridManager;
 
     [Header("デッキの設定")]
-    public List<GameObject> playerHandCards;
-    public List<GameObject> EnemyHandCards;
+    [SerializeField] private List<GameObject> playerHandCards;
+    [SerializeField] private List<GameObject> EnemyHandCards;
 
     [SerializeField] private Transform enemyCardBox;
     [SerializeField] private Transform playerCardBox;
@@ -58,7 +58,7 @@ public class CardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// カードを使用する（コストチェック、効果発動、コスト消費、カードの破棄を一度に行う）
+    /// カードを使用する（コストチェック、効果発動、コスト消費、カードの破棄）
     /// </summary>
     public bool UseCard(Vector2Int targetPosition, Card card, bool isPlayerOwnedCard)
     {
@@ -75,7 +75,6 @@ public class CardManager : MonoBehaviour
         switch (card.CardData.type)
         {
             case CardType.Summon:
-                Debug.Log("今からカード使いますよ");
                 gridManager.SpawnUnit(card.CardData.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), isPlayerOwnedCard);
                 break;
 
@@ -95,26 +94,33 @@ public class CardManager : MonoBehaviour
         }
 
         // カードの後処理（選択解除とオブジェクトの破棄）
-        Debug.Log("カードを使ったので非表示にします");
         card.SetSelected(false);
         card.gameObject.SetActive(false);
+        Destroy(card.gameObject);
+        if (isPlayerOwnedCard) currentPlayerSelectedCard = null;
+        else currentEnemySelectedCard = null;
 
         return true;
     }
 
-    /// <summary>
-    /// 手札の親オブジェクトの子要素から、敵のカード（Cardコンポーネント）のリストをすべて取得する
-    /// </summary>
+
     public List<GameObject> GetEnemyHandCards()
     {
-        List<GameObject> handCardObjects = new List<GameObject>();
+        List<GameObject> cardlist = new List<GameObject>();
+
         foreach (Transform child in enemyCardBox)
         {
-            if (child.GetComponent<Card>() == null) continue;
-            handCardObjects.Add(child.gameObject);
-
+            // 子オブジェクトがnullでなく、かつCardコンポーネントを持っている場合のみ追加する
+            if (child != null)
+            {
+                Card cardComponent = child.GetComponent<Card>();
+                if (cardComponent != null)
+                {
+                    cardlist.Add(child.gameObject);
+                }
+            }
         }
 
-        return handCardObjects;
+        return cardlist;
     }
 }

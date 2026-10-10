@@ -42,17 +42,9 @@ public class GridCell : MonoBehaviour
                 break;
 
             case GameManager.GamePhase.MoveReservation:
-                ProcessMoveReservation(gridPosition);
+                if (GridManager.Instance.SelectedUnit == null) break;
+                _gridManager.ReserveMove(_gridManager.SelectedUnit, gridPosition, true);
                 break;
         }
-    }
-
-    private void ProcessMoveReservation(Vector2Int targetPos)
-    {
-
-        Debug.Log("移動予約を今から");
-        _gridManager.ReserveMove(_gridManager.SelectedUnit, targetPos);
-        _gridManager.DeselectUnit();
-
     }
 }

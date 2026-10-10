@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4021183483767990442}
   - component: {fileID: 6428320384482677595}
   - component: {fileID: 8944060536093517178}
-  - component: {fileID: -1243480036500462133}
+  - component: {fileID: -9151898145222418934}
   m_Layer: 0
   m_Name: Momotaro_Card
   m_TagString: Untagged
@@ -113,7 +113,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-1243480036500462133
+--- !u!114 &-9151898145222418934
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,5 +124,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 381a1ba19a9039049af932e313384829, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CardView
+  m_EditorClassIdentifier: Assembly-CSharp::Card
   cardData: {fileID: 11400000, guid: 6b4ec2bbdfa856e49b0510de1db30af0, type: 2}
