@@ -27,10 +27,6 @@ public class GridManager : MonoBehaviour
     [Header("Selection Ring Settings")]
     [SerializeField] private Transform _sharedSelectionRingTransform; // シーン上にある唯一のリングのTransform
     [SerializeField] private Vector3 _hiddenPosition = new Vector3(0, -999f, 0); // 非選択時の退避場所
-
-    private Unit[,] _grid = new Unit[Cols, Rows];
-    private bool[,] _obstacles = new bool[Cols, Rows];
-
     public Unit SelectedUnit { get; private set; }
 
     [Header("Indicator Settings")]
@@ -131,17 +127,13 @@ public class GridManager : MonoBehaviour
     }
 
 
-    public bool CanPlaceUnit(int col, int row)
-    {
-        if (!IsValidCoordinate(col, row)) return false;
-        return _grid[col, row] == null && !_obstacles[col, row];
-    }
+    //public bool CanPlaceUnit(int col, int row)
+    //{
+    //    if (!IsValidCoordinate(col, row)) return false;
+    //    return _grid[col, row] == null && !_obstacles[col, row];
+    //}
 
-    public bool IsCellOccupied(Vector2Int pos)
-    {
-        if (!IsValidCoordinate(pos.x, pos.y)) return true;
-        return _grid[pos.x, pos.y] != null || _obstacles[pos.x, pos.y];
-    }
+
 
 
 
@@ -153,39 +145,12 @@ public class GridManager : MonoBehaviour
         if (!unit) return;
         unit.IsPlayerOwned = isPlayerOwned;
         unit.CurrentPosition = pos;
-        _grid[pos.x, pos.y] = unit;
+        //_grid[pos.x, pos.y] = unit;
         if (!_allActiveUnits.Contains(unit)) _allActiveUnits.Add(unit);
 
 
     }
-    public void PlaceUnit(Unit unit, int col, int row)
-    {
-        if (IsValidCoordinate(col, row))
-        {
-            _grid[col, row] = unit;
-        }
-    }
 
-    public void RemoveUnit(int col, int row)
-    {
-        if (IsValidCoordinate(col, row))
-        {
-            _grid[col, row] = null;
-        }
-    }
-
-
-
-    public bool TryMoveUnit(int fromCol, int fromRow, int toCol, int toRow)
-    {
-        if (!IsValidCoordinate(toCol, toRow) || _grid[toCol, toRow] != null || _obstacles[toCol, toRow])
-            return false;
-
-        Unit unit = _grid[fromCol, fromRow];
-        _grid[toCol, toRow] = unit;
-        _grid[fromCol, fromRow] = null;
-        return true;
-    }
 
     public bool IsValidCoordinate(int col, int row)
     {
@@ -199,7 +164,7 @@ public class GridManager : MonoBehaviour
         SelectedUnit = unit;
         List<Vector2Int> range = unit.GetMovalePositions(unit.CurrentPosition);
         ShowMovableRangeIndicator(range);
-        MoveRingToPosition(GetUnitPosition(unit));
+        MoveRingToPosition(unit.CurrentPosition);
 
     }
 
@@ -236,7 +201,6 @@ public class GridManager : MonoBehaviour
             playerUnitMoveOder = (targetPos, unit);
             _movableIndicatorDecidededPrefab.transform.position = new Vector3(targetPos.x, 0.11f, targetPos.y);
         }
-        else enemyUnitMoveOder = (targetPos, unit);
 
     }
 
@@ -259,37 +223,9 @@ public class GridManager : MonoBehaviour
     }
 
 
-    public Vector2Int GetUnitPosition(Unit unit)
-    {
-        for (int c = 0; c < Cols; c++)
-        {
-            for (int r = 0; r < Rows; r++)
-            {
-                if (_grid[c, r] == unit)
-                {
-                    return new Vector2Int(c, r);
-                }
-            }
-        }
-        return new Vector2Int(-1, -1);
-    }
 
-    public List<Vector2Int> GetAllUnitPositionsByTeam(TeamType team)
-    {
-        List<Vector2Int> list = new List<Vector2Int>();
-        bool targetIsPlayer = (team == TeamType.Player);
-        for (int c = 0; c < Cols; c++)
-        {
-            for (int r = 0; r < Rows; r++)
-            {
-                if (_grid[c, r] != null && _grid[c, r].IsPlayerOwned == targetIsPlayer)
-                {
-                    list.Add(new Vector2Int(c, r));
-                }
-            }
-        }
-        return list;
-    }
+
+
     /// <summary>
     /// プレイヤーと敵の移動予約を実際に実行し、位置を更新する
     /// </summary>
@@ -298,8 +234,8 @@ public class GridManager : MonoBehaviour
         Debug.Log("すべてのユニットの移動処理を実行します。");
         ExecuteMovementOrder(playerUnitMoveOder);
         ExecuteMovementOrder(enemyUnitMoveOder);
-        playerUnitMoveOder = (default, null);
-        enemyUnitMoveOder = (default, null);
+        //playerUnitMoveOder = (default, null);
+        //enemyUnitMoveOder = (default, null);
         DeselectUnit();
     }
 
@@ -308,16 +244,15 @@ public class GridManager : MonoBehaviour
     /// </summary>
     private void ExecuteMovementOrder((Vector2Int reservePos, Unit unit) order)
     {
+        Debug.Log("今から移動");
         if (order.unit == null) return;
-
         Vector2Int targetPos = order.reservePos;
-        Vector2Int currentPos = GetUnitPosition(order.unit);
+        Vector2Int currentPos = order.unit.CurrentPosition;
 
         // 現在地と移動先の座標が両方とも有効かチェック
         if (IsValidCoordinate(currentPos.x, currentPos.y) && IsValidCoordinate(targetPos.x, targetPos.y))
         {
-            _grid[currentPos.x, currentPos.y] = null;
-            _grid[targetPos.x, targetPos.y] = order.unit;
+            Debug.Log("今から移動!!");
             Vector3 worldPos = GridToWorldPosition(targetPos);
             order.unit.transform.position = worldPos;
             order.unit.CurrentPosition = targetPos;
@@ -325,45 +260,14 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public void SetCellObstacle(Vector2Int pos, bool isObstacle)
-    {
-        if (IsValidCoordinate(pos.x, pos.y))
-        {
-            _obstacles[pos.x, pos.y] = isObstacle;
-        }
-    }
 
-    public void ClearGrid()
-    {
-        for (int c = 0; c < Cols; c++)
-        {
-            for (int r = 0; r < Rows; r++)
-            {
-                _grid[c, r] = null;
-                _obstacles[c, r] = false;
-            }
-        }
-    }
     /// <summary>
     /// グリッド座標 (Vector2Int) をワールド座標 (Vector3) に変換する
     /// </summary>
-    public Vector3 GridToWorldPosition(Vector2Int gridPos)
+    private Vector3 GridToWorldPosition(Vector2Int gridPos)
     {
         return new Vector3(gridPos.x, 0f, gridPos.y);
     }
-
-    /// <summary>
-    /// ワールド座標 (Vector3) を一番近いグリッド座標 (Vector2Int) に変換する
-    /// </summary>
-    public Vector2Int WorldToGridPosition(Vector3 worldPos)
-    {
-        int x = Mathf.RoundToInt(worldPos.x);
-        int y = Mathf.RoundToInt(worldPos.z);
-        return new Vector2Int(x, y);
-    }
-
-
-
 
     public Unit GetUnitAtPosition(Vector2Int pos)
     {

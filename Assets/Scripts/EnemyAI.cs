@@ -18,8 +18,7 @@ public class EnemyAI : MonoBehaviour
     [Header("Enemy Cost Settings")]
     [SerializeField] private int enemyCurrentCost = 3;
 
-    [Header("References")]
-    [SerializeField] private GridManager gridManager;
+    private GridManager gridManager;
     private void Awake()
     {
         gridManager = FindFirstObjectByType<GridManager>();
@@ -38,7 +37,8 @@ public class EnemyAI : MonoBehaviour
         {
             for (int c = 0; c < GridManager.Cols; c++)
             {
-                if (gridManager.CanPlaceUnit(c, r)) availableSpawnCells.Add(new Vector2Int(c, r));
+
+                availableSpawnCells.Add(new Vector2Int(c, r));
             }
         }
         if (availableSpawnCells.Count <= 0) return;
@@ -52,15 +52,12 @@ public class EnemyAI : MonoBehaviour
             if (newCard.CardData.cost <= enemyCurrentCost) canUseCards.Add(newCard);
         }
 
-        Debug.Log($"いｍからカード{canUseCards.Count}");
         // 1. 1つを選ぶ(ユニットが1体もいない場合は、スペルカードを使わない)
         foreach (Card cardObj in canUseCards)
         {
 
-            Debug.Log("いｍからカード");
             if (gridManager.GetUnitsByTeam(false).Count == 0 && cardObj.CardData.type != CardType.Summon) continue;
 
-            Debug.Log("いｍからカードつかうで");
             CardManager.Instance.UseCard(decidePos, cardObj, false);
             break;
         }
@@ -84,7 +81,7 @@ public class EnemyAI : MonoBehaviour
             if (enemy == null) continue;
 
             // 敵の現在地を取得
-            Vector2Int enemyPos = gridManager.GetUnitPosition(enemy);
+            Vector2Int enemyPos = enemy.CurrentPosition;
             if (!gridManager.IsValidCoordinate(enemyPos.x, enemyPos.y)) continue;
 
             // 2. この敵が移動できるマスのリストを取得する
@@ -151,7 +148,8 @@ public class EnemyAI : MonoBehaviour
         // 4. 選ばれた最善の移動先を GridManager に予約する
         if (bestCandidate.unit != null)
         {
-            gridManager.ReserveMove(bestCandidate.unit, bestCandidate.targetPos, false);
+            //gridManager.ReserveMove(bestCandidate.unit, bestCandidate.targetPos, false);
+            GridManager.Instance.enemyUnitMoveOder = (bestCandidate.targetPos, bestCandidate.unit);
             Debug.Log($"[敵AI] {bestCandidate.unit.name} が {bestCandidate.targetPos} への移動を予約しました。（評価スコア: {highestScore}）");
         }
     }
@@ -182,7 +180,7 @@ public class EnemyAI : MonoBehaviour
         foreach (var player in playerUnits)
         {
             if (player == null) continue;
-            Vector2Int playerPos = gridManager.GetUnitPosition(player);
+            Vector2Int playerPos = player.CurrentPosition;
 
             float dist = Mathf.Abs(pos.x - playerPos.x) + Mathf.Abs(pos.y - playerPos.y);
             if (dist < minDistanceToPlayer)
