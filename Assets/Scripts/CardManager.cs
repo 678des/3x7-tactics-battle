@@ -7,32 +7,31 @@ using UnityEngine;
 public class CardManager : MonoBehaviour
 {
     public static CardManager Instance;
+    private GridManager gridManager;
 
-    [Header("References")]
-    [SerializeField] private GridManager gridManager;
+    [Header("デッキの設定")]
+    public List<GameObject> playerHandCards;
+    public List<GameObject> EnemyHandCards;
 
-    [Header("Initial Setup (Decks)")]
-    [SerializeField] private List<GameObject> playerStartingCards;
-    [SerializeField] private List<GameObject> enemyStartingCards;
+    [SerializeField] private Transform enemyCardBox;
+    [SerializeField] private Transform playerCardBox;
+
 
     [Header("Hand / UI Settings")]
     [SerializeField] private Vector3 handOffset = new Vector3(0, 0.3f, -0.4f);
-    [SerializeField] private Quaternion handRotation = Quaternion.Euler(0, 90, 30);
+    private Quaternion handRotation = Quaternion.Euler(0, 90, 30);
 
-    //現在選択しているカード
-    public Card currentSelectedCard;
+    //現在味方が選択しているカード
+    public static Card currentPlayerSelectedCard;
+    //現在敵が選択しているカード
+    public static Card currentEnemySelectedCard;
 
-    public List<GameObject> EnemyStartingCards => enemyStartingCards;
 
     private void Awake()
     {
-        if (gridManager == null)
-            gridManager = GetComponent<GridManager>();
+        Instance = this;
+        gridManager = FindFirstObjectByType<GridManager>();
 
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject);
     }
 
     /// <summary>
@@ -40,60 +39,44 @@ public class CardManager : MonoBehaviour
     /// </summary>
     public void DistributeStartingCards()
     {
-        SpawnCardsForTeam(playerStartingCards, TeamType.Player);
-        SpawnCardsForTeam(enemyStartingCards, TeamType.Enemy);
+        SpawnCardsForTeam(playerHandCards, TeamType.Player, playerCardBox);
+        SpawnCardsForTeam(EnemyHandCards, TeamType.Enemy, enemyCardBox);
     }
 
     /// <summary>
     /// チームごとにカードプレハブを生成する（味方・敵を明確に分離）
     /// </summary>
-    private void SpawnCardsForTeam(List<GameObject> cardPrefabs, TeamType team)
+    private void SpawnCardsForTeam(List<GameObject> cardPrefabs, TeamType team, Transform parent)
     {
-        if (cardPrefabs == null || cardPrefabs.Count == 0) return;
-
-        bool isPlayer = (team == TeamType.Player);
 
         for (int i = 0; i < cardPrefabs.Count; i++)
         {
             if (cardPrefabs[i] == null) continue;
-
-            // 手札エリアへの配置（※もしグリッド上に直接置く場合はここをグリッド座標に書き換えます）
-            Vector3 spawnPos = handOffset + new Vector3(i * 1.5f, 0, isPlayer ? 0 : 5f); // 味方と敵で少し位置を分ける例
-            GameObject cardObj = Instantiate(cardPrefabs[i], spawnPos, handRotation, this.transform);
+            Vector3 spawnPos = handOffset + new Vector3(i * 1.5f, 0, team == TeamType.Player ? 0 : 7f); // 味方と敵で少し位置を分ける例
+            Instantiate(cardPrefabs[i], spawnPos, handRotation, parent);
         }
     }
 
-    public void UseSelectedCard(Vector2Int targetPosition)
+    /// <summary>
+    /// カードを使用する（コストチェック、効果発動、コスト消費、カードの破棄を一度に行う）
+    /// </summary>
+    public bool UseCard(Vector2Int targetPosition, Card card, bool isPlayerOwnedCard)
     {
-        Debug.Log("カードを使おうと");
-        if (TryUseCard(currentSelectedCard, targetPosition))
-        {
-            if (currentSelectedCard != null)
-            {
-                currentSelectedCard.SetSelected(false);
-                Destroy(currentSelectedCard.gameObject);
-            }
-            currentSelectedCard = null;
-        }
-    }
-
-    public bool TryUseCard(Card card, Vector2Int targetPosition)
-    {
-        Debug.Log("カードを使おうと重い");
         if (card == null) return false;
-        Debug.Log("カードを使おうと思いました");
-        if (GameManager.Instance.CurrentPlayerCost < card.CardData.cost)
+
+        // コスト不足のチェック
+        if (GameManager.Instance != null && GameManager.Instance.CurrentPlayerCost < card.CardData.cost)
         {
             Debug.LogWarning("コスト不足です。");
             return false;
         }
 
+        // カードの種類に応じた効果処理
         switch (card.CardData.type)
         {
             case CardType.Summon:
-                // 味方による召喚を想定（敵のAIが使う場合はチーム判定が必要になります）
                 Debug.Log("今からカード使いますよ");
-                gridManager.SpawnUnit(card.CardData.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), true);
+                gridManager.SpawnUnit(card.CardData.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), isPlayerOwnedCard);
                 break;
 
             case CardType.Buff:
@@ -105,11 +88,33 @@ public class CardManager : MonoBehaviour
                 break;
         }
 
+        // コストの消費
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.TryConsumeCost(TeamType.Player, card.CardData.cost);
+            GameManager.Instance.TryConsumeCost(isPlayerOwnedCard, card.CardData.cost);
         }
 
+        // カードの後処理（選択解除とオブジェクトの破棄）
+        Debug.Log("カードを使ったので非表示にします");
+        card.SetSelected(false);
+        card.gameObject.SetActive(false);
+
         return true;
+    }
+
+    /// <summary>
+    /// 手札の親オブジェクトの子要素から、敵のカード（Cardコンポーネント）のリストをすべて取得する
+    /// </summary>
+    public List<GameObject> GetEnemyHandCards()
+    {
+        List<GameObject> handCardObjects = new List<GameObject>();
+        foreach (Transform child in enemyCardBox)
+        {
+            if (child.GetComponent<Card>() == null) continue;
+            handCardObjects.Add(child.gameObject);
+
+        }
+
+        return handCardObjects;
     }
 }

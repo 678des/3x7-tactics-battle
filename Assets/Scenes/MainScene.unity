@@ -225,6 +225,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &386216128
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 386216129}
+  m_Layer: 0
+  m_Name: 'PlayerCardBox '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &386216129
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386216128}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1600845309}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &564659737
 GameObject:
   m_ObjectHideFlags: 0
@@ -1021,7 +1052,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 26531483}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: OnEndTurnButtonClicked
         m_Mode: 1
@@ -1146,16 +1177,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 224f3df201a435c4c8eb19a21b264920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardManager
-  gridManager: {fileID: 1534873815}
-  playerStartingCards:
-  - {fileID: 2342147767846308965, guid: 1a3caa14a77b9e64a92e08b3c1cbaa9d, type: 3}
-  - {fileID: 2342147767846308965, guid: 063ba80ab2b029646bb2225e2efb6fcf, type: 3}
-  enemyStartingCards:
+  playerHandCards:
   - {fileID: 2342147767846308965, guid: 063ba80ab2b029646bb2225e2efb6fcf, type: 3}
   - {fileID: 2342147767846308965, guid: 063ba80ab2b029646bb2225e2efb6fcf, type: 3}
+  EnemyHandCards:
+  - {fileID: 2342147767846308965, guid: 6505ab397c70a88458601d7c6e8b7753, type: 3}
+  - {fileID: 2342147767846308965, guid: 063ba80ab2b029646bb2225e2efb6fcf, type: 3}
+  enemyCardBox: {fileID: 1720052324}
+  playerCardBox: {fileID: 386216129}
   handOffset: {x: 0, y: 0.3, z: -0.4}
-  handRotation: {x: 0.1830127, y: 0.68301266, z: 0.1830127, w: 0.68301266}
-  currentSelectedCard: {fileID: 0}
 --- !u!4 &1600845309
 Transform:
   m_ObjectHideFlags: 0
@@ -1168,7 +1198,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1720052324}
+  - {fileID: 386216129}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1605034546
@@ -1216,6 +1248,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BaseController
   maxHp: 100
+--- !u!1 &1720052323
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1720052324}
+  m_Layer: 0
+  m_Name: EnemyCardBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1720052324
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720052323}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1600845309}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1755522341
 GameObject:
   m_ObjectHideFlags: 0

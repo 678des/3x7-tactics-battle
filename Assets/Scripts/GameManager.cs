@@ -35,12 +35,35 @@ public class GameManager : MonoBehaviour
     public int CurrentEnemyCost => currentEnemyCost;
 
 
+    private void Awake()
+    {
+        // 依存関係のキャッシュ
+        if (gridManager == null) gridManager = GetComponent<GridManager>();
+        if (battleProcessor == null) battleProcessor = GetComponent<BattleProcessor>();
+        if (enemyAI == null) enemyAI = GetComponent<EnemyAI>();
+        Instance = this;
+    }
+
+    private void Start()
+    {
+
+        gridManager = FindAnyObjectByType<GridManager>();
+        enemyAI = FindAnyObjectByType<EnemyAI>();
+        battleProcessor = FindAnyObjectByType<BattleProcessor>();
+
+        currentEnemyCost = maxCost;
+        currentPlayerCost = maxCost;
+
+        CardManager.Instance.DistributeStartingCards();
+        StartPhase(GamePhase.Spawn);
+    }
+
 
 
     // コストを消費する処理
-    public bool TryConsumeCost(TeamType team, int amount)
+    public bool TryConsumeCost(bool isPlayer, int amount)
     {
-        if (team == TeamType.Player)
+        if (isPlayer)
         {
             if (currentPlayerCost >= amount)
             {
@@ -86,28 +109,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Awake()
-    {
-        // 依存関係のキャッシュ
-        if (gridManager == null) gridManager = GetComponent<GridManager>();
-        if (battleProcessor == null) battleProcessor = GetComponent<BattleProcessor>();
-        if (enemyAI == null) enemyAI = GetComponent<EnemyAI>();
-        Instance = this;
-    }
-
-    private void Start()
-    {
-
-        gridManager = FindAnyObjectByType<GridManager>();
-        enemyAI = FindAnyObjectByType<EnemyAI>();
-        battleProcessor = FindAnyObjectByType<BattleProcessor>();
-
-        currentEnemyCost = maxCost;
-        currentPlayerCost = maxCost;
-
-        CardManager.Instance.DistributeStartingCards();
-        StartPhase(GamePhase.Spawn);
-    }
 
 
 

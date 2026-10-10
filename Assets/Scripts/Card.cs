@@ -10,7 +10,7 @@ using UnityEngine;
 public class Card : MonoBehaviour
 {
     [SerializeField] private CardData cardData;
-    [SerializeField] private CardManager cardManager;
+    private CardManager cardManager;
 
     private bool isSelected = false;
 
@@ -35,7 +35,7 @@ public class Card : MonoBehaviour
 
         if (isSelected)
         {
-            CardManager.Instance.currentSelectedCard = this;
+            CardManager.currentPlayerSelectedCard = this;
             transform.localPosition += new Vector3(0f, 1, 0f);
         }
         else transform.localPosition = originalPosition;

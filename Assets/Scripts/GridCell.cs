@@ -38,7 +38,7 @@ public class GridCell : MonoBehaviour
         switch (GameManager.CurrentPhase)
         {
             case GameManager.GamePhase.Spawn:
-                _cardManager.UseSelectedCard(gridPosition);
+                _cardManager.UseCard(gridPosition, CardManager.currentPlayerSelectedCard, true);
                 break;
 
             case GameManager.GamePhase.MoveReservation:

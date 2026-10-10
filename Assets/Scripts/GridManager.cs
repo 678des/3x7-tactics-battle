@@ -92,8 +92,8 @@ public class GridManager : MonoBehaviour
 
     public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation, bool isPlayerOwned)
     {
-        if (!IsValidCoordinate(pos.x, pos.y)) return;
-        if (IsCellOccupied(pos)) return;
+        //if (!IsValidCoordinate(pos.x, pos.y)) return;
+        //if (IsCellOccupied(pos)) return;
 
 
         GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
@@ -166,7 +166,7 @@ public class GridManager : MonoBehaviour
 
     public void ReserveMove(Unit unit, Vector2Int targetPos)
     {
-        if (GameManager.CurrentPhase != GameManager.GamePhase.MoveReservation) return;
+        if (GameManager.CurrentPhase != GameManager.GamePhase.MoveReservation || unit == null) return;
         Debug.Log($"{unit}{targetPos}移動予約した");
         if (_reservedMoves.ContainsKey(unit))
         {
