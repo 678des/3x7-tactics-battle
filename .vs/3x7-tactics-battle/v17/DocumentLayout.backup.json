@@ -3,32 +3,36 @@
   "WorkspaceRootPath": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\enemyai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\enemyai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\gridmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gridmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\gridcell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gridcell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\cardmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cardmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|c:\\users\\user\\documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\unit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\unit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|c:\\users\\user\\documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\scenechanger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\scenechanger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\card.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\card.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\cardmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cardmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\unit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\unit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\carddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\carddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\gridmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gridmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\enemyai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\enemyai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\gridcell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gridcell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BB0331C8-046D-AEC5-7107-0BB2E3934BC6}|Assembly-CSharp.csproj|C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\assets\\scripts\\movableindicator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -62,7 +66,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -78,20 +82,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "SceneChanger.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\SceneChanger.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\SceneChanger.cs",
+              "ToolTip": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\SceneChanger.cs",
+              "RelativeToolTip": "Assets\\Scripts\\SceneChanger.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-10T19:00:13.195Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "GridManager.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\GridManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GridManager.cs",
               "ToolTip": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\GridManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\GridManager.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAAH8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T23:53:45.698Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-08T23:53:45.698Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 4,
               "Title": "CardData.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\CardData.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\CardData.cs",
@@ -103,33 +119,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "Unit.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\Unit.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\Unit.cs",
               "ToolTip": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\Unit.cs",
               "RelativeToolTip": "Assets\\Scripts\\Unit.cs",
-              "ViewState": "AgIAAJMAAAAAAAAAAAAAAKgAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAJkAAAAAAAAAAAAAAKYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T23:21:59.422Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-08T23:21:59.422Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "CardManager.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\CardManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\CardManager.cs",
               "ToolTip": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\CardManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\CardManager.cs",
-              "ViewState": "AgIAAE8AAAAAAAAAAAAcwGIAAAAhAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJQAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T23:53:15.988Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-08T23:53:15.988Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "GridCell.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\GridCell.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GridCell.cs",
@@ -137,12 +151,11 @@
               "RelativeToolTip": "Assets\\Scripts\\GridCell.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAArwC4AAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T23:22:36.701Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-08T23:22:36.701Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 6,
               "Title": "EnemyAI.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\EnemyAI.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\EnemyAI.cs",
@@ -150,24 +163,23 @@
               "RelativeToolTip": "Assets\\Scripts\\EnemyAI.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-09T00:27:42.787Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-09T00:27:42.787Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 1,
               "Title": "Card.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\Card.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\Card.cs",
               "ToolTip": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\Card.cs",
               "RelativeToolTip": "Assets\\Scripts\\Card.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAOAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAB0AAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-10T01:24:15.842Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "MovableIndicator.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\MovableIndicator.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\MovableIndicator.cs",
@@ -179,7 +191,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "UIManager.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\UIManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\UIManager.cs",
@@ -191,7 +203,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "InputHandler.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\InputHandler.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\InputHandler.cs",
@@ -203,7 +215,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "SelectionRing.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\SelectionRing.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\SelectionRing.cs",
@@ -215,7 +227,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "BattleProcessor.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\BattleProcessor.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\BattleProcessor.cs",
@@ -227,7 +239,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "GameManager.cs",
               "DocumentMoniker": "C:\\Users\\user\\Documents\\git_project\\37_2\\3x7-tactics-battle\\Assets\\Scripts\\GameManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameManager.cs",
