@@ -53,11 +53,11 @@ public class EnemyAI : MonoBehaviour
         {
             List<CardData> affordableSummonCards = new List<CardData>();
 
-            foreach (GameObject cardView in GameManager.Instance.enemyStartingCards)
+            foreach (GameObject cardView in CardManager.Instance.EnemyStartingCards)
             {
                 if (cardView != null)
                 {
-                    var cardViewComponent = cardView.GetComponent<CardView>();
+                    var cardViewComponent = cardView.GetComponent<Card>();
                     if (cardViewComponent != null && cardViewComponent.CardData != null &&
                         cardViewComponent.CardData.type == CardType.Summon &&
                         cardViewComponent.CardData.cost <= enemyCurrentCost)
@@ -181,6 +181,58 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+
+    //private float EvaluateCandidate(AIMoveCandidate candidate)
+    //{
+    //    float score = 0f;
+    //    Vector2Int pos = candidate.targetPos;
+    //    Unit enemyUnit = candidate.unit; // 動こうとしている敵ユニット自身
+
+    //    // フィールド上のすべてのプレイヤー（味方）ユニットを取得
+    //    List<Unit> playerUnits = gridManager.GetUnitsByTeam(true);
+
+    //    if (playerUnits.Count == 0)
+    //    {
+    //        // プレイヤーがいない場合は、とりあえず前進（yが小さくなる方向など）を評価
+    //        return -pos.y;
+    //    }
+
+    //    // ① 一番近いプレイヤーユニットとの距離を測る（近いほど高得点）
+    //    float minDistanceToPlayer = 999f;
+    //    Unit nearestPlayer = null;
+
+    //    foreach (var player in playerUnits)
+    //    {
+    //        if (player == null) continue;
+    //        Vector2Int playerPos = gridManager.GetUnitPosition(player);
+
+    //        // マンハッタン距離 (|x1 - x2| + |y1 - y2|)
+    //        float dist = Mathf.Abs(pos.x - playerPos.x) + Mathf.Abs(pos.y - playerPos.y);
+    //        if (dist < minDistanceToPlayer)
+    //        {
+    //            minDistanceToPlayer = dist;
+    //            nearestPlayer = player; // 一番近い味方を記録しておく
+    //        }
+    //    }
+
+    //    // 基本スコア：プレイヤーに近づくほど高得点（例: 20から距離を引く）
+    //    score += (20f - minDistanceToPlayer);
+
+    //    // ②一番近いプレイヤーとの相性を判定して評価を調整する
+    //    if (nearestPlayer != null && enemyUnit != null)
+    //    {
+    //        // Unit側、あるいは BattleProcessor 側にある属性相性判定を呼び出す
+    //        int advantage = BattleProcessor.Instance.GetElementAdvantage(enemyUnit.Element, nearestPlayer.Element);
+
+    //        if (advantage < 0 && minDistanceToPlayer <= 1f) score -= 500f;
+    //        else if (advantage < 0) score -= 300f;
+    //        else if (advantage > 0) score += 15f;
+
+    //    }
+
+    //    Debug.Log($"{candidate.unit.name} が {pos} に移動した場合のスコア: {score}点");
+    //    return score;
+    //}
     /// <summary>
     /// 1つの移動候補（AIMoveCandidate）に対する「評価値（点数）」を計算する関数
     /// </summary>
@@ -195,44 +247,57 @@ public class EnemyAI : MonoBehaviour
 
         if (playerUnits.Count == 0)
         {
-            // プレイヤーがいない場合は、とりあえず前進（yが小さくなる方向など）を評価
-            return -pos.y;
+            return -pos.y; // プレイヤーがいない場合は前進
         }
 
-        // ① 一番近いプレイヤーユニットとの距離を測る（近いほど高得点）
+        // ① 一番近いプレイヤーとの距離、およびその相性を調べる
         float minDistanceToPlayer = 999f;
         Unit nearestPlayer = null;
+        int nearestAdvantage = 0;
 
         foreach (var player in playerUnits)
         {
             if (player == null) continue;
             Vector2Int playerPos = gridManager.GetUnitPosition(player);
 
-            // マンハッタン距離 (|x1 - x2| + |y1 - y2|)
             float dist = Mathf.Abs(pos.x - playerPos.x) + Mathf.Abs(pos.y - playerPos.y);
             if (dist < minDistanceToPlayer)
             {
                 minDistanceToPlayer = dist;
-                nearestPlayer = player; // 一番近い味方を記録しておく
+                nearestPlayer = player;
             }
         }
 
-        // 基本スコア：プレイヤーに近づくほど高得点（例: 20から距離を引く）
-        score += (20f - minDistanceToPlayer);
-
-        // ②一番近いプレイヤーとの相性を判定して評価を調整する
         if (nearestPlayer != null && enemyUnit != null)
         {
-            // Unit側、あるいは BattleProcessor 側にある属性相性判定を呼び出す
-            int advantage = BattleProcessor.Instance.GetElementAdvantage(enemyUnit.Element, nearestPlayer.Element);
-
-            if (advantage < 0 && minDistanceToPlayer <= 1f) score -= 500f;
-            else if (advantage < 0) score -= 300f;
-            else if (advantage > 0) score += 15f;
-
+            // この「一番近いプレイヤー」との相性を取得 (-1: 不利, 0: 互角, 1: 有利)
+            nearestAdvantage = BattleProcessor.Instance.GetElementAdvantage(enemyUnit.Element, nearestPlayer.Element);
         }
 
-        Debug.Log($"{candidate.unit.name} が {pos} に移動した場合のスコア: {score}点");
+        // ② 相性に応じた距離の評価（ここがポイント！）
+        if (nearestAdvantage > 0)
+        {
+            // 【有利な相手】：近づくほどスコアが高くなる（積極的に詰める）
+            score += (20f - minDistanceToPlayer) * 1.5f;
+            score += 50f; // 有利な相手がいること自体のボーナス
+        }
+        else if (nearestAdvantage < 0)
+        {
+            // 【不利な相手】：**離れるほどスコアが高くなる（逃げる・距離を取る）**
+            // 逆に「minDistanceToPlayer」が大きいほど高得点にする
+            score += minDistanceToPlayer * 2.0f;
+            score -= 100f; // 不利な相手が近くにいることへの強烈なペナルティ
+        }
+        else
+        {
+            // 【互角の相手】：程よい距離感を保つ（例: 近すぎず遠すぎずの中間を評価するなど、お好みで）
+            score += (10f - Mathf.Abs(minDistanceToPlayer - 2f));
+        }
+
+        // ③ もしこの移動先から攻撃できる相手がいれば大ボーナス（オプション）
+        // if (CanAttackAnyPlayerFrom(pos, enemyUnit)) { score += 100f; }
+
+        Debug.Log($"{candidate.unit.name} が {pos} に移動した場合のスコア: {score}点 (相性:{nearestAdvantage})");
         return score;
     }
 }

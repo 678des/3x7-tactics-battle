@@ -1,104 +1,115 @@
-// Responsibility: Hand management, cost consumption, and card effect application.
-// Attachment Note: Attach to a GameManager or CardManager GameObject in the scene.
-
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 手札の管理、カード効果の適用を行うマネージャークラス。
+/// 手札の管理、コスト消費、カード効果の適用、および初期配置を行うマネージャークラス。
 /// </summary>
-[RequireComponent(typeof(UnityEngine.Transform))]
 public class CardManager : MonoBehaviour
 {
-    [Header("Settings")]
-    //[SerializeField] private int currentCost = 3;
-    [SerializeField] private int maxCost = 3;
+    public static CardManager Instance;
 
     [Header("References")]
     [SerializeField] private GridManager gridManager;
 
+    [Header("Initial Setup (Decks)")]
+    [SerializeField] private List<GameObject> playerStartingCards;
+    [SerializeField] private List<GameObject> enemyStartingCards;
 
-    private CardData selectedCard;
-    private CardView selectedView;
+    [Header("Hand / UI Settings")]
+    [SerializeField] private Vector3 handOffset = new Vector3(0, 0.3f, -0.4f);
+    [SerializeField] private Quaternion handRotation = Quaternion.Euler(0, 90, 30);
 
-    //public int CurrentCost => currentCost;
-    public int MaxCost => maxCost;
+    //現在選択しているカード
+    public Card currentSelectedCard;
+
+    public List<GameObject> EnemyStartingCards => enemyStartingCards;
 
     private void Awake()
     {
         if (gridManager == null)
             gridManager = GetComponent<GridManager>();
+
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
     }
 
-
-
-    public void SelectCard(CardData card, CardView view)
+    /// <summary>
+    /// ゲームスタート時にプレイヤーと敵のカードをそれぞれ生成・配置する
+    /// </summary>
+    public void DistributeStartingCards()
     {
-        if (selectedView != null)
-        {
-            selectedView.SetSelected(false);
-        }
+        SpawnCardsForTeam(playerStartingCards, TeamType.Player);
+        SpawnCardsForTeam(enemyStartingCards, TeamType.Enemy);
+    }
 
-        selectedCard = card;
-        selectedView = view;
+    /// <summary>
+    /// チームごとにカードプレハブを生成する（味方・敵を明確に分離）
+    /// </summary>
+    private void SpawnCardsForTeam(List<GameObject> cardPrefabs, TeamType team)
+    {
+        if (cardPrefabs == null || cardPrefabs.Count == 0) return;
 
-        if (selectedView != null)
+        bool isPlayer = (team == TeamType.Player);
+
+        for (int i = 0; i < cardPrefabs.Count; i++)
         {
-            selectedView.SetSelected(true);
+            if (cardPrefabs[i] == null) continue;
+
+            // 手札エリアへの配置（※もしグリッド上に直接置く場合はここをグリッド座標に書き換えます）
+            Vector3 spawnPos = handOffset + new Vector3(i * 1.5f, 0, isPlayer ? 0 : 5f); // 味方と敵で少し位置を分ける例
+            GameObject cardObj = Instantiate(cardPrefabs[i], spawnPos, handRotation, this.transform);
         }
     }
 
     public void UseSelectedCard(Vector2Int targetPosition)
     {
-
-        if (TryUseCard(selectedCard, targetPosition))
+        Debug.Log("カードを使おうと");
+        if (TryUseCard(currentSelectedCard, targetPosition))
         {
-            if (selectedView != null)
+            if (currentSelectedCard != null)
             {
-                selectedView.SetSelected(false);
-                Destroy(selectedView.gameObject);
+                currentSelectedCard.SetSelected(false);
+                Destroy(currentSelectedCard.gameObject);
             }
-            selectedCard = null;
-            selectedView = null;
+            currentSelectedCard = null;
         }
     }
 
-    public bool TryUseCard(CardData card, Vector2Int targetPosition)
+    public bool TryUseCard(Card card, Vector2Int targetPosition)
     {
+        Debug.Log("カードを使おうと重い");
         if (card == null) return false;
-        Debug.Log("try!");
-        if (card != null && GameManager.Instance.CurrentPlayerCost < card.cost)
+        Debug.Log("カードを使おうと思いました");
+        if (GameManager.Instance.CurrentPlayerCost < card.CardData.cost)
         {
             Debug.LogWarning("コスト不足です。");
             return false;
         }
 
-        switch (card.type)
+        switch (card.CardData.type)
         {
             case CardType.Summon:
-                if (!gridManager.IsCellOccupied(targetPosition))
-                {
-                    Debug.Log("try!!");
-
-                    gridManager.SpawnUnit(card.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), true);
-                }
-                else
-                {
-                    return false;
-                }
+                // 味方による召喚を想定（敵のAIが使う場合はチーム判定が必要になります）
+                Debug.Log("今からカード使いますよ");
+                gridManager.SpawnUnit(card.CardData.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), true);
                 break;
 
             case CardType.Buff:
-                //ApplyBuff(card);
+                // TODO: バフ効果の適用
                 break;
 
             case CardType.Debuff:
-                // ApplyDebuff(card, targetPosition);
+                // TODO: デバフ効果の適用
                 break;
         }
 
-        GameManager.Instance.TryConsumeCost(TeamType.Player, card.cost);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.TryConsumeCost(TeamType.Player, card.CardData.cost);
+        }
+
         return true;
     }
-
-
 }

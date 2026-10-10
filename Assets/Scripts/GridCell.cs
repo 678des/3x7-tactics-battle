@@ -19,13 +19,13 @@ public class GridCell : MonoBehaviour
         set => gridPosition = value;
     }
 
-    private GameManager _gameManager;
+    // private GameManager _gameManager;
     private GridManager _gridManager;
     private CardManager _cardManager;
 
     private void Awake()
     {
-        _gameManager = FindFirstObjectByType<GameManager>();
+        //_gameManager = FindFirstObjectByType<GameManager>();
         _gridManager = FindFirstObjectByType<GridManager>();
         _cardManager = FindFirstObjectByType<CardManager>();
     }
@@ -38,15 +38,10 @@ public class GridCell : MonoBehaviour
         switch (GameManager.CurrentPhase)
         {
             case GameManager.GamePhase.Spawn:
-
-                if (_cardManager != null)
-                {
-                    _cardManager.UseSelectedCard(gridPosition);
-                }
+                _cardManager.UseSelectedCard(gridPosition);
                 break;
 
             case GameManager.GamePhase.MoveReservation:
-                Debug.Log("移動予約のPhaseではある");
                 ProcessMoveReservation(gridPosition);
                 break;
         }

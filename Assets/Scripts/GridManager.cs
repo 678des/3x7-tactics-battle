@@ -75,48 +75,6 @@ public class GridManager : MonoBehaviour
     /// <summary>
     /// 指定されたチームの陣地に、手持ちのカードプレハブ群を均等に配置する
     /// </summary>
-    public void SpawnCardsForTeam(List<GameObject> cardPrefabs, TeamType team)
-    {
-        if (cardPrefabs == null || cardPrefabs.Count == 0) return;
-
-        List<Vector2Int> availablePositions = new List<Vector2Int>();
-
-        if (team == TeamType.Player)
-        {
-            // プレイヤーの陣地は行0付近を想定（必要に応じて調整）
-            for (int r = -1; r < 2 && r < Rows; r++)
-            {
-                for (int c = 0; c < Cols; c++)
-                {
-                    if (CanPlaceUnit(c, r))
-                    {
-                        availablePositions.Add(new Vector2Int(c, r));
-                    }
-                }
-            }
-        }
-        else
-        {
-            // 敵の陣地は行Rows-1付近を想定
-            for (int r = Rows; r >= Rows - 2 && r >= 0; r--)
-            {
-                for (int c = 0; c < Cols; c++)
-                {
-                    if (CanPlaceUnit(c, r))
-                    {
-                        availablePositions.Add(new Vector2Int(c, r));
-                    }
-                }
-            }
-        }
-
-        // 均等に配置するためにリストをシャッフルまたはそのまま利用して順に配置
-        for (int i = 0; i < cardPrefabs.Count && i < availablePositions.Count; i++)
-        {
-
-            SpawnUnit(cardPrefabs[i], availablePositions[i], cardRotation, false);
-        }
-    }
 
     public bool CanPlaceUnit(int col, int row)
     {

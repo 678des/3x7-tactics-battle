@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: aka
   type: 0
-  cost: 0
+  cost: 10
   unitPrefab: {fileID: 4057958304938924769, guid: a1e5d8716d3167945a320c47fbf3ba6d, type: 3}
   powerModifier: 0

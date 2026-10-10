@@ -14,19 +14,16 @@ public class GameManager : MonoBehaviour
         Battle
     }
 
+    private GridManager gridManager;
+    private BattleProcessor battleProcessor;
+    private EnemyAI enemyAI;
 
     [Header("Base HP Settings")]
     [SerializeField] private int playerBaseHP = 10;
     [SerializeField] private int enemyBaseHP = 10;
-    [Header("References")]
-    [SerializeField] private GridManager gridManager;
-    [SerializeField] private BattleProcessor battleProcessor;
-    [SerializeField] private EnemyAI enemyAI;
-    [Header("Initial Setup")]
-    [SerializeField] private System.Collections.Generic.List<GameObject> playerStartingCards;
-    public System.Collections.Generic.List<GameObject> enemyStartingCards;
+
     [Header("Cost Settings")]
-    [SerializeField] private int maxCost = 5;      // 最大コスト（上限）
+    [SerializeField] private int maxCost = 20;      // 最大コスト（上限）
     private int currentPlayerCost;                 // プレイヤーの現在のコスト
     private int currentEnemyCost;
 
@@ -38,13 +35,7 @@ public class GameManager : MonoBehaviour
     public int CurrentEnemyCost => currentEnemyCost;
 
 
-    // フェーズが「Spawn」に入ったときにコストを全回復させる
-    public void ResetCostForNewPhase()
-    {
-        currentPlayerCost = maxCost;
-        currentEnemyCost = maxCost;
-        Debug.Log("コストが全回復しました！");
-    }
+
 
     // コストを消費する処理
     public bool TryConsumeCost(TeamType team, int amount)
@@ -106,27 +97,19 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        DistributeStartingCards();
+
+        gridManager = FindAnyObjectByType<GridManager>();
+        enemyAI = FindAnyObjectByType<EnemyAI>();
+        battleProcessor = FindAnyObjectByType<BattleProcessor>();
+
+        currentEnemyCost = maxCost;
+        currentPlayerCost = maxCost;
+
+        CardManager.Instance.DistributeStartingCards();
         StartPhase(GamePhase.Spawn);
     }
 
-    /// <summary>
-    /// ゲームスタート時にプレイヤーと敵の陣地に手持ちのカードを均等に配置する
-    /// </summary>
-    private void DistributeStartingCards()
-    {
-        if (gridManager != null)
-        {
-            if (playerStartingCards != null && playerStartingCards.Count > 0)
-            {
-                gridManager.SpawnCardsForTeam(playerStartingCards, TeamType.Player);
-            }
-            if (enemyStartingCards != null && enemyStartingCards.Count > 0)
-            {
-                gridManager.SpawnCardsForTeam(enemyStartingCards, TeamType.Enemy);
-            }
-        }
-    }
+
 
     public void StartPhase(GamePhase phase)
     {
