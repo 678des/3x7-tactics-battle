@@ -39,16 +39,16 @@ public class UIManager : MonoBehaviour
     private void UpdateCostDisplay()
     {
 
-        playerCostText.text = GameManager.Instance.CurrentPlayerCost.ToString() + " / 20";
-        enemyCostText.text = GameManager.Instance.CurrentEnemyCost.ToString() + " / 20";
+        playerCostText.text = "Cost: " + GameManager.Instance.CurrentPlayerCost.ToString();
+        enemyCostText.text = "Cost: " + GameManager.Instance.CurrentEnemyCost.ToString();
 
     }
 
     private void UpdateBaseHpDisplay()
     {
 
-        playerBaseHpText.text = "Player HP: " + GameManager.Instance.PlayerBaseHP.ToString();
-        enemyBaseHpText.text = "Enemy HP: " + GameManager.Instance.EnemyBaseHP.ToString();
+        playerBaseHpText.text = "HP: " + GameManager.Instance.PlayerBaseHP.ToString() + " / 20";
+        enemyBaseHpText.text = "HP: " + GameManager.Instance.EnemyBaseHP.ToString() + " / 20";
 
     }
 
