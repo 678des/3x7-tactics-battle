@@ -134,6 +134,8 @@ public class GridManager : MonoBehaviour
     public void SpawnUnit(GameObject unitPrefab, Vector2Int pos, Quaternion rotation, bool isPlayerOwned)
     {
 
+        if (isPlayerOwned && pos.y >= 2) return;
+
         GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
         GameObject par = Instantiate(spawnEffect.gameObject, obj.transform.position, Quaternion.Euler(-90, 0, 0));
         par.GetComponent<ParticleSystem>().Play();
@@ -190,7 +192,9 @@ public class GridManager : MonoBehaviour
 
     public void ReserveMove(Unit unit, Vector2Int targetPos, bool isPlayerOwned)
     {
+
         if (GameManager.CurrentPhase != GameManager.GamePhase.MoveReservation || unit == null || SelectedUnit == null) return;
+        if (!unit.GetMovalePositions(unit.CurrentPosition).Contains(targetPos)) return;
         if (isPlayerOwned)
         {
             playerUnitMoveOder = (targetPos, unit);

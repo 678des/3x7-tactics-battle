@@ -36,12 +36,14 @@ public class GridCell : MonoBehaviour
         switch (GameManager.CurrentPhase)
         {
             case GameManager.GamePhase.Spawn:
+
+                if (gridPosition.y >= 2) return;
                 _cardManager.UseCard(gridPosition, CardManager.currentPlayerSelectedCard, true);
                 break;
 
             case GameManager.GamePhase.MoveReservation:
                 if (GridManager.Instance.SelectedUnit == null) break;
-                _gridManager.ReserveMove(_gridManager.SelectedUnit, gridPosition, true);
+                _gridManager.ReserveMove(_gridManager.SelectedUnit, this.gridPosition, true);
                 break;
         }
     }

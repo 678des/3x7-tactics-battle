@@ -16,6 +16,7 @@ public class Unit : MonoBehaviour
 
     [Header("Visual Settings")]
     [SerializeField] private MeshRenderer _unitMesh;
+
     private bool _isSelected = false;
 
     //[SerializeField] private Color _selectionColor = Color.cyan;
@@ -73,6 +74,7 @@ public class Unit : MonoBehaviour
 
         if (_unitMesh == null) _unitMesh = GetComponent<MeshRenderer>();
         if (_unitMesh != null) _materialInstance = _unitMesh.material;
+
 
     }
     private void Update()

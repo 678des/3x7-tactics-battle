@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7900411526090058934}
   - component: {fileID: 111979479717788284}
   - component: {fileID: 2653788140574012464}
-  - component: {fileID: 849460882035137268}
   - component: {fileID: -2247873795825100034}
+  - component: {fileID: 2139454351827330147}
   m_Layer: 0
   m_Name: Akazukin
   m_TagString: Untagged
@@ -92,29 +92,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &849460882035137268
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4057958304938924769}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-2247873795825100034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,7 +107,6 @@ MonoBehaviour:
   element: 0
   power: 10
   _unitMesh: {fileID: 0}
-  _selectionColor: {r: 0.23890376, g: 1, b: 0, a: 1}
   IsPlayerOwned: 1
   MovePattern:
   - {x: 0, y: 1}
@@ -152,3 +128,24 @@ MonoBehaviour:
   - {x: -1, y: -1}
   _defaultMaterial: {fileID: 2100000, guid: b25fc8aa64e74184c8f56e1dd45bbca9, type: 2}
   _selectedMaterial: {fileID: 2100000, guid: b25fc8aa64e74184c8f56e1dd45bbca9, type: 2}
+--- !u!65 &2139454351827330147
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4057958304938924769}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.66223407, y: 0.44917375, z: 1.0945543}
+  m_Center: {x: 0.000000014901161, y: 0.056206867, z: 0.6687105}
