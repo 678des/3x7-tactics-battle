@@ -19,13 +19,11 @@ public class GridCell : MonoBehaviour
         set => gridPosition = value;
     }
 
-    // private GameManager _gameManager;
     private GridManager _gridManager;
     private CardManager _cardManager;
 
     private void Awake()
     {
-        //_gameManager = FindFirstObjectByType<GameManager>();
         _gridManager = FindFirstObjectByType<GridManager>();
         _cardManager = FindFirstObjectByType<CardManager>();
     }

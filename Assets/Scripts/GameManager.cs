@@ -1,5 +1,5 @@
+using System.Collections;
 using UnityEngine;
-
 /// <summary>
 /// ゲームのフェーズ遷移を管理するメインコントローラー。
 /// スポーン、移動予約、移動実行、バトル処理のサイクルを制御する。
@@ -87,29 +87,47 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void DamageBase(TeamType targetTeam, int damage)
     {
+
+        SoundManager.Instance.PlayAttackBase();
         if (targetTeam == TeamType.Player)
         {
             playerBaseHP -= damage;
-            Debug.Log($"【プレイヤー拠点】が攻撃を受けた！ 残りHP: {playerBaseHP}");
             if (playerBaseHP <= 0)
             {
-                Debug.Log("ゲームオーバー：敵の勝利です");
-                // TODO: 敗北演出やリザルト画面への遷移
+                StartCoroutine(HandleGameEndRoutine(false));
             }
         }
         else
         {
             enemyBaseHP -= damage;
-            Debug.Log($"【敵の拠点】が攻撃を受けた！ 残りHP: {enemyBaseHP}");
             if (enemyBaseHP <= 0)
             {
-                Debug.Log("ゲームクリア：プレイヤーの勝利です！");
-                // TODO: 勝利演出やリザルト画面への遷移
+                StartCoroutine(HandleGameEndRoutine(true));
             }
         }
     }
 
 
+
+    /// <summary>
+    /// 1秒待機した後にUIManagerへリザルト表示を依頼するコルーチン
+    /// </summary>
+    /// <param name="isPlayerWin">プレイヤーが勝ったか</param>
+    private IEnumerator HandleGameEndRoutine(bool isPlayerWin)
+    {
+        // 1秒間しっかり余韻（演出やヒットストップ、エフェクトの残り時間）を待つ
+        yield return new WaitForSeconds(2.0f);
+
+        // UIManager経由でリザルト画面を表示する
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowResultScreen(isPlayerWin);
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] UIManager.Instance が見つかりませんでした。");
+        }
+    }
 
 
     public void StartPhase(GamePhase phase)
@@ -119,6 +137,7 @@ public class GameManager : MonoBehaviour
         switch (phase)
         {
             case GamePhase.Spawn:
+                UIManager.Instance.PhaseEndButtonDisplay(true);
                 enemyAI.ExecuteEnemySpawnPhase();
                 break;
             case GamePhase.MoveReservation:
@@ -156,7 +175,9 @@ public class GameManager : MonoBehaviour
     {
         if (CurrentPhase == GamePhase.MoveReservation)
         {
+            UIManager.Instance.PhaseEndButtonDisplay(false);
             StartPhase(GamePhase.MoveExecution);
+
         }
         else if (CurrentPhase == GamePhase.Spawn)
         {

@@ -24,6 +24,9 @@ public class GridManager : MonoBehaviour
     [SerializeField, Tooltip("生成するマスのPrefab")]
     private GameObject cellPrefab;
 
+    [Header("Effect")]
+    [SerializeField] private ParticleSystem spawnEffect;
+
     [Header("Selection Ring Settings")]
     [SerializeField] private Transform _sharedSelectionRingTransform; // シーン上にある唯一のリングのTransform
     [SerializeField] private Vector3 _hiddenPosition = new Vector3(0, -999f, 0); // 非選択時の退避場所
@@ -132,11 +135,12 @@ public class GridManager : MonoBehaviour
     {
 
         GameObject obj = Instantiate(unitPrefab, new Vector3(pos.x, 0, pos.y), rotation);
+        GameObject par = Instantiate(spawnEffect.gameObject, obj.transform.position, Quaternion.Euler(-90, 0, 0));
+        par.GetComponent<ParticleSystem>().Play();
         Unit unit = obj.GetComponent<Unit>();
         if (!unit) return;
         unit.IsPlayerOwned = isPlayerOwned;
         unit.CurrentPosition = pos;
-        //_grid[pos.x, pos.y] = unit;
         if (!_allActiveUnits.Contains(unit)) _allActiveUnits.Add(unit);
 
 
@@ -191,6 +195,7 @@ public class GridManager : MonoBehaviour
         {
             playerUnitMoveOder = (targetPos, unit);
             _movableIndicatorDecidededPrefab.transform.position = new Vector3(targetPos.x, 0.11f, targetPos.y);
+            SoundManager.Instance.PlayReserve();
         }
 
     }
@@ -222,11 +227,9 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public void ProcessAllUnitMovements()
     {
-        Debug.Log("すべてのユニットの移動処理を実行します。");
         ExecuteMovementOrder(playerUnitMoveOder);
         ExecuteMovementOrder(enemyUnitMoveOder);
-        //playerUnitMoveOder = (default, null);
-        //enemyUnitMoveOder = (default, null);
+
         DeselectUnit();
     }
 
@@ -235,7 +238,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     private void ExecuteMovementOrder((Vector2Int reservePos, Unit unit) order)
     {
-        Debug.Log("今から移動");
+
         if (order.unit == null) return;
         Vector2Int targetPos = order.reservePos;
         Vector2Int currentPos = order.unit.CurrentPosition;
@@ -243,11 +246,11 @@ public class GridManager : MonoBehaviour
         // 現在地と移動先の座標が両方とも有効かチェック
         if (IsValidCoordinate(currentPos.x, currentPos.y) && IsValidCoordinate(targetPos.x, targetPos.y))
         {
-            Debug.Log("今から移動!!");
             Vector3 worldPos = GridToWorldPosition(targetPos);
             order.unit.transform.position = worldPos;
             order.unit.CurrentPosition = targetPos;
-            Debug.Log($"{order.unit.name} を {currentPos} から {targetPos} へ移動しました。");
+            SoundManager.Instance.PlayMove();
+
         }
     }
 
@@ -268,11 +271,11 @@ public class GridManager : MonoBehaviour
         {
             if (unit != null && unit.CurrentPosition == pos)
             {
-                Debug.Log("見つかりました");
-                return unit; // 見つかったらそのユニットを返す
+
+                return unit;
             }
         }
-        return null; // 誰もいなければnull
+        return null;
     }
 }
 

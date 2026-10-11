@@ -14,8 +14,6 @@ public class BattleProcessor : MonoBehaviour
         List<Unit> allUnits = GridManager.Instance.GetAllUnits();
         List<Unit> unitsToDestroy = new List<Unit>();
 
-        Debug.Log("ユニット");
-
         foreach (var attacker in allUnits)
         {
             if (attacker == null || unitsToDestroy.Contains(attacker)) continue;
@@ -23,10 +21,7 @@ public class BattleProcessor : MonoBehaviour
             // 2. 自身の現在地から攻撃範囲（絶対座標のリスト）を算出
             List<Vector2Int> attackablePositions = attacker.GetAttackablePositions(attacker.CurrentPosition);
 
-            foreach (var position in attackablePositions)
-            {
-                Debug.Log($"{position}攻撃範囲！");
-            }
+
             Unit targetEnemy = null;
             bool isInBaseRange = false;
 
@@ -38,7 +33,7 @@ public class BattleProcessor : MonoBehaviour
                 if (occupant != null && occupant.IsPlayerOwned != attacker.IsPlayerOwned)
                 {
                     targetEnemy = occupant;
-                    Debug.Log($"{attacker.IsPlayerOwned}敵を発見{targetEnemy}");
+                    Debug.Log($"{attacker.gameObject.name}が敵を発見{targetEnemy.gameObject.name}");
 
 
                     break;
@@ -69,6 +64,7 @@ public class BattleProcessor : MonoBehaviour
         {
             if (deadUnit != null)
             {
+                SoundManager.Instance.PlayAttack();
                 Destroy(deadUnit.gameObject);
             }
         }

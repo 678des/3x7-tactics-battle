@@ -75,6 +75,7 @@ public class CardManager : MonoBehaviour
         switch (card.CardData.type)
         {
             case CardType.Summon:
+
                 gridManager.SpawnUnit(card.CardData.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), isPlayerOwnedCard);
                 break;
 
@@ -86,6 +87,7 @@ public class CardManager : MonoBehaviour
                 // TODO: デバフ効果の適用
                 break;
         }
+        SoundManager.Instance.PlayPut();
 
         // コストの消費
         if (GameManager.Instance != null)
@@ -147,5 +149,6 @@ public class CardManager : MonoBehaviour
         }
         _card.SetSelected(true);
         currentPlayerSelectedCard = _card;
+        SoundManager.Instance.PlayClick();
     }
 }

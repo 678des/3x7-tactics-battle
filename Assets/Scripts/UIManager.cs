@@ -3,12 +3,17 @@
 
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Canvas))]
 public class UIManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private CardManager cardManager;
+
+    public static UIManager Instance;
+
+    [Header("UI Panels")]
+    [SerializeField] private GameObject _resultPanel; // リザルト画面全体のUIパネル
+    [SerializeField] private TextMeshProUGUI _resultText;
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI playerCostText;
@@ -16,6 +21,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerBaseHpText;
     [SerializeField] private TextMeshProUGUI enemyBaseHpText;
     [SerializeField] private TextMeshProUGUI phaseText;
+    [SerializeField] private Button phaseEndButton;
+
+    private void Awake()
+    {
+        Instance = this;
+        _resultPanel.SetActive(false);
+    }
 
     private void Update()
     {
@@ -45,6 +57,34 @@ public class UIManager : MonoBehaviour
         if (phaseText != null)
         {
             phaseText.text = "Phase: " + GameManager.CurrentPhase.ToString();
+        }
+    }
+
+    public void PhaseEndButtonDisplay(bool enabled)
+    {
+        phaseEndButton.enabled = enabled;
+    }
+
+    /// <summary>
+    /// ゲーム終了時に呼び出されるリザルト画面表示メソッド
+    /// </summary>
+    /// <param name="isPlayerWin">trueなら勝利、falseなら敗北</param>
+    public void ShowResultScreen(bool isPlayerWin)
+    {
+        PhaseEndButtonDisplay(false);
+        if (_resultPanel != null)
+        {
+            _resultPanel.SetActive(true);
+        }
+
+        // 勝利・敗北に応じたテキストの切り替えなどがあればここに書く
+        if (isPlayerWin)
+        {
+            _resultText.text = "VICTORY";
+        }
+        else
+        {
+            _resultText.text = "DEFEAT";
         }
     }
 }
