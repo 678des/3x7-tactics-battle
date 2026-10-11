@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7900411526090058934}
   - component: {fileID: 5091736185789910127}
   m_Layer: 0
-  m_Name: Saru 1
+  m_Name: Ryoshi
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -23,8 +23,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int enemyBaseHP = 10;
 
     [Header("Cost Settings")]
-    [SerializeField] private int maxCost = 20;      // 最大コスト（上限）
-    private int currentPlayerCost;                 // プレイヤーの現在のコスト
+    [SerializeField] private int maxCost = 20;
+    private int currentPlayerCost;
     private int currentEnemyCost;
 
     public static GamePhase CurrentPhase { get; private set; }
@@ -37,16 +37,11 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // 依存関係のキャッシュ
-        if (gridManager == null) gridManager = GetComponent<GridManager>();
-        if (battleProcessor == null) battleProcessor = GetComponent<BattleProcessor>();
-        if (enemyAI == null) enemyAI = GetComponent<EnemyAI>();
         Instance = this;
     }
 
     private void Start()
     {
-
         gridManager = FindAnyObjectByType<GridManager>();
         enemyAI = FindAnyObjectByType<EnemyAI>();
         battleProcessor = FindAnyObjectByType<BattleProcessor>();

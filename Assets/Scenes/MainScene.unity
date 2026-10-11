@@ -2671,15 +2671,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 224f3df201a435c4c8eb19a21b264920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardManager
-  playerHandCards:
-  - {fileID: 2342147767846308965, guid: 840cc7410fb19d04b9ff762de6d91e26, type: 3}
-  - {fileID: 2342147767846308965, guid: fba42663b9b32614c819681e70dbd5de, type: 3}
-  - {fileID: 2342147767846308965, guid: 8757989d2c3dcbe4db5871bd60044613, type: 3}
-  - {fileID: 2342147767846308965, guid: aeff6a548ae2954428e2f80f02855e43, type: 3}
-  EnemyHandCards:
-  - {fileID: 2342147767846308965, guid: 59573e4c0aa1d654cbc4f2478f6415aa, type: 3}
+  AkazukinCardPrefabs:
   - {fileID: 2342147767846308965, guid: 3eb07bd03f96ef14ea1ae23512ed4fc0, type: 3}
+  - {fileID: 2342147767846308965, guid: 59573e4c0aa1d654cbc4f2478f6415aa, type: 3}
   - {fileID: 2342147767846308965, guid: 562bf233a9d4880448cf499dbc13aafb, type: 3}
+  MomotaroCardPrefabs:
+  - {fileID: 2342147767846308965, guid: aeff6a548ae2954428e2f80f02855e43, type: 3}
+  - {fileID: 2342147767846308965, guid: 840cc7410fb19d04b9ff762de6d91e26, type: 3}
+  - {fileID: 2342147767846308965, guid: 8757989d2c3dcbe4db5871bd60044613, type: 3}
+  - {fileID: 2342147767846308965, guid: fba42663b9b32614c819681e70dbd5de, type: 3}
   enemyCardBox: {fileID: 1720052324}
   playerCardBox: {fileID: 386216129}
   handOffset: {x: 0, y: 0.3, z: -0.4}

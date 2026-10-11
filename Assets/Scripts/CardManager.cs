@@ -10,8 +10,8 @@ public class CardManager : MonoBehaviour
     private GridManager gridManager;
 
     [Header("デッキの設定")]
-    [SerializeField] private List<GameObject> playerHandCards;
-    [SerializeField] private List<GameObject> EnemyHandCards;
+    [SerializeField] private List<GameObject> AkazukinCardPrefabs;
+    [SerializeField] private List<GameObject> MomotaroCardPrefabs;
 
     [SerializeField] private Transform enemyCardBox;
     [SerializeField] private Transform playerCardBox;
@@ -34,20 +34,36 @@ public class CardManager : MonoBehaviour
 
     }
 
+
+
     /// <summary>
     /// ゲームスタート時にプレイヤーと敵のカードをそれぞれ生成・配置する
     /// </summary>
     public void DistributeStartingCards()
     {
-        SpawnCardsForTeam(playerHandCards, TeamType.Player, playerCardBox);
-        SpawnCardsForTeam(EnemyHandCards, TeamType.Enemy, enemyCardBox);
+        SpawnCardsForTeam(TeamType.Player, GameData.PlayerSelectedTeam, playerCardBox);
+        SpawnCardsForTeam(TeamType.Enemy, EnemyAI.enemyTeam, enemyCardBox);
     }
 
     /// <summary>
-    /// チームごとにカードプレハブを生成する（味方・敵を明確に分離）
+    /// チームごとにカードプレハブを生成する
     /// </summary>
-    private void SpawnCardsForTeam(List<GameObject> cardPrefabs, TeamType team, Transform parent)
+    private void SpawnCardsForTeam(TeamType team, Team unitTeam, Transform parent)
     {
+        Debug.Log($"{unitTeam}カードを生成します{team}");
+        List<GameObject> cardPrefabs = new();
+        switch (unitTeam)
+        {
+            case Team.Akazukin:
+                cardPrefabs = AkazukinCardPrefabs;
+                break;
+            case Team.Momotaro:
+                cardPrefabs = MomotaroCardPrefabs;
+                break;
+            default:
+                break;
+        }
+        if (cardPrefabs.Count == 0) return;
 
         for (int i = 0; i < cardPrefabs.Count; i++)
         {

@@ -6,6 +6,10 @@ using UnityEngine;
 /// 一番近い味方のマスに向かって移動するロジックを実行する。
 /// </summary>
 /// // AIの「移動の候補」を1つにまとめるデータ入れ
+/// 
+
+
+
 public struct AIMoveCandidate
 {
     public Unit unit;         // 動かすキャラクター
@@ -17,11 +21,28 @@ public class EnemyAI : MonoBehaviour
 {
     [Header("Enemy Cost Settings")]
     [SerializeField] private int enemyCurrentCost = 3;
+    public static Team enemyTeam = Team.None;
 
     private GridManager gridManager;
+
     private void Awake()
     {
         gridManager = FindFirstObjectByType<GridManager>();
+        enemyTeam = SetEnemyTeam();
+    }
+    /// <summary>
+    /// 敵がプレイヤーが選択した以外のチームを選択する初期関数
+    /// </summary>
+    private Team SetEnemyTeam()
+    {
+        // まず、現在存在するすべてのチームを列挙してリストにする
+        List<Team> allTeams = new List<Team>((Team[])System.Enum.GetValues(typeof(Team)));
+        allTeams.Remove(GameData.PlayerSelectedTeam);
+        allTeams.Remove(Team.None);
+        Debug.Log($"選ばれたのは。{allTeams[0]}");
+        if (allTeams.Count > 0) return allTeams[0];
+        Debug.LogWarning("選択可能な他のチームが存在しません。");
+        return GameData.PlayerSelectedTeam;
     }
 
     /// <summary>
