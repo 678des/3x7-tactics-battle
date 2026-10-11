@@ -75,8 +75,8 @@ public class CardManager : MonoBehaviour
         switch (card.CardData.type)
         {
             case CardType.Summon:
-
-                gridManager.SpawnUnit(card.CardData.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, 0), isPlayerOwnedCard);
+                float z = isPlayerOwnedCard ? 0f : -180f;
+                gridManager.SpawnUnit(card.CardData.unitPrefab, targetPosition, Quaternion.Euler(-90, 0, z), isPlayerOwnedCard);
                 break;
 
             case CardType.Buff:
