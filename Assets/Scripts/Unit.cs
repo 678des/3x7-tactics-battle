@@ -7,26 +7,22 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 {
     public enum ElementType { Fire, Water, Grass }
+    public enum MoveCellType { Cross, UpDown, naname, Surrounding, None };
+    public enum AttackCellType { Cross, UpDown, naname, Surrounding, None };
 
 
-    [Header("Unit Status")]
+    [Header("ユニット設定")]
     [SerializeField] private ElementType element = ElementType.Fire;
     [SerializeField] private int power = 10;
-    private Material _materialInstance;
+    [SerializeField] private MoveCellType moveType = MoveCellType.UpDown;
+    [SerializeField] private AttackCellType attackCellType = AttackCellType.UpDown;
 
-    [Header("Visual Settings")]
-    [SerializeField] private MeshRenderer _unitMesh;
 
-    private bool _isSelected = false;
 
-    //[SerializeField] private Color _selectionColor = Color.cyan;
-    //private float _minIntensity = 0f;
-    //private float _maxIntensity = 1.0f;
-    //private float _pulseSpeed = 4.0f; // 点滅の速さ
-
-    public bool IsPlayerOwned = true;
+    [HideInInspector] public bool IsPlayerOwned = true;
     public ElementType Element => element;
     public Vector2Int CurrentPosition { get; set; }
+
 
     public int CurrentPower
     {
@@ -34,11 +30,22 @@ public class Unit : MonoBehaviour
         set => power = Mathf.Max(0, value);
     }
 
-    public Vector2Int? PlannedDestination { get; set; } = null;
 
-    [Header("Ranges (Relative Offsets)")]
-    [Tooltip("移動できるマスの相対座標リスト")]
-    public List<Vector2Int> MovePattern = new List<Vector2Int>
+    [HideInInspector]
+    public List<Vector2Int> MoveCells = new List<Vector2Int>
+    {
+        new Vector2Int( 0,  1), // 上
+        new Vector2Int( 0, -1), // 下
+        new Vector2Int( 1,  0), // 右
+        new Vector2Int(-1,  0), // 左
+        new Vector2Int( 1,  1), // 右上
+        new Vector2Int(-1,  1), // 左上
+        new Vector2Int( 1, -1), // 右下
+        new Vector2Int(-1, -1)  // 左下
+    };
+
+    [HideInInspector]
+    public List<Vector2Int> AttackCells = new List<Vector2Int>
     {
         new Vector2Int(0,0),
         new Vector2Int( 0,  1), // 上
@@ -51,82 +58,112 @@ public class Unit : MonoBehaviour
         new Vector2Int(-1, -1)  // 左下
     };
 
-    [Tooltip("攻撃できるマスの相対座標リスト")]
-    public List<Vector2Int> AttackPattern = new List<Vector2Int>
-    {
-        new Vector2Int(0,0),
-        new Vector2Int( 0,  1), // 上
-        new Vector2Int( 0, -1), // 下
-        new Vector2Int( 1,  0), // 右
-        new Vector2Int(-1,  0), // 左
-        new Vector2Int( 1,  1), // 右上
-        new Vector2Int(-1,  1), // 左上
-        new Vector2Int( 1, -1), // 右下
-        new Vector2Int(-1, -1)  // 左下
-    };
-
-    [Header("Visual Settings")]
-    [SerializeField] private Material _defaultMaterial;   // 通常時のマテリアル
-    [SerializeField] private Material _selectedMaterial;  // 選択時の光るマテリアル
 
     private void Awake()
     {
 
-        if (_unitMesh == null) _unitMesh = GetComponent<MeshRenderer>();
-        if (_unitMesh != null) _materialInstance = _unitMesh.material;
-
-
-    }
-    private void Update()
-    {
-        //// 選択されている間、毎フレーム発光の強さを脈動させる
-        //if (_isSelected && _materialInstance != null)
-        //{
-        //    // サイン波を使って強度を滑らかに往復させる (-1〜1 を 0〜1 に変換しつつ倍率調整)
-        //    float t = (Mathf.Sin(Time.time * _pulseSpeed) + 1f) / 2f;
-        //    float currentIntensity = Mathf.Lerp(_minIntensity, _maxIntensity, t);
-
-        //    _materialInstance.SetColor("_EmissionColor", _selectionColor * currentIntensity);
-        //}
+        SetUnitAttackMoveCells();
     }
 
-
+    //
     /// <summary>
-    /// このユニットが選択されたかどうかに応じて、見た目を更新する。
-    /// GridManagerから呼び出される。
+    /// ユニットの移動可能範囲と攻撃可能範囲を設定する
     /// </summary>
-    /// <param name="isSelected">選択された場合はtrue, そうでない場合はfalse</param>
-    public void SetSelectionState(bool isSelected)
+    private void SetUnitAttackMoveCells()
     {
-        if (_unitMesh != null && _selectedMaterial != null && _defaultMaterial != null)
-        {
-            _isSelected = isSelected;
-            //if (_materialInstance == null) return;
+        // リストを初期化（必要に応じて）
+        MoveCells.Clear();
+        AttackCells.Clear();
 
-            //if (_isSelected)
-            //{
-            //    _materialInstance.EnableKeyword("_EMISSION");
-            //    _materialInstance.SetColor("_EmissionColor", _selectionColor * _maxIntensity);
-            //}
-            //else
-            //{
-            //    _materialInstance.DisableKeyword("_EMISSION");
-            //    _materialInstance.SetColor("_EmissionColor", Color.black);
-            //}
+        // --- 移動範囲の設定 ---
+        switch (moveType)
+        {
+            case MoveCellType.Cross:
+                // 上下左右
+                MoveCells.Add(new Vector2Int(0, 1));   // 上
+                MoveCells.Add(new Vector2Int(0, -1));  // 下
+                MoveCells.Add(new Vector2Int(-1, 0));  // 左
+                MoveCells.Add(new Vector2Int(1, 0));   // 右
+                break;
+
+            case MoveCellType.UpDown:
+                // 上下のみ
+                MoveCells.Add(new Vector2Int(0, 1));   // 上
+                MoveCells.Add(new Vector2Int(0, -1));  // 下
+                break;
+
+            case MoveCellType.naname:
+                // 斜め4方向
+                MoveCells.Add(new Vector2Int(-1, 1));  // 左上
+                MoveCells.Add(new Vector2Int(1, 1));   // 右上
+                MoveCells.Add(new Vector2Int(-1, -1)); // 左下
+                MoveCells.Add(new Vector2Int(1, -1));  // 右下
+                break;
+            case MoveCellType.Surrounding:
+                MoveCells.Add(new Vector2Int(0, 1));   // 上
+                MoveCells.Add(new Vector2Int(0, -1));  // 下
+                MoveCells.Add(new Vector2Int(-1, 0));  // 左
+                MoveCells.Add(new Vector2Int(1, 0));   // 右
+                MoveCells.Add(new Vector2Int(-1, 1));  // 左上
+                MoveCells.Add(new Vector2Int(1, 1));   // 右上
+                MoveCells.Add(new Vector2Int(-1, -1)); // 左下
+                MoveCells.Add(new Vector2Int(1, -1));  // 右下
+                break;
+
+            case MoveCellType.None:
+            default:
+                // 移動なし
+                break;
+        }
+
+        // --- 攻撃範囲の設定 ---
+        // （攻撃側の設定も同様にswitchで分岐）
+        switch (attackCellType)
+        {
+            case AttackCellType.Cross:
+                // 上下左右
+                AttackCells.Add(new Vector2Int(0, 1));
+                AttackCells.Add(new Vector2Int(0, -1));
+                AttackCells.Add(new Vector2Int(-1, 0));
+                AttackCells.Add(new Vector2Int(1, 0));
+                break;
+
+            case AttackCellType.UpDown:
+                // 上下のみ
+                AttackCells.Add(new Vector2Int(0, 1));
+                AttackCells.Add(new Vector2Int(0, -1));
+                break;
+            case AttackCellType.naname:
+                MoveCells.Add(new Vector2Int(-1, 1));  // 左上
+                MoveCells.Add(new Vector2Int(1, 1));   // 右上
+                MoveCells.Add(new Vector2Int(-1, -1)); // 左下
+                MoveCells.Add(new Vector2Int(1, -1));  // 右下
+                break;
+            case AttackCellType.Surrounding:
+                MoveCells.Add(new Vector2Int(0, 1));   // 上
+                MoveCells.Add(new Vector2Int(0, -1));  // 下
+                MoveCells.Add(new Vector2Int(-1, 0));  // 左
+                MoveCells.Add(new Vector2Int(1, 0));   // 右
+                MoveCells.Add(new Vector2Int(-1, 1));  // 左上
+                MoveCells.Add(new Vector2Int(1, 1));   // 右上
+                MoveCells.Add(new Vector2Int(-1, -1)); // 左下
+                MoveCells.Add(new Vector2Int(1, -1));  // 右下
+                break;
+
+            case AttackCellType.None:
+            default:
+                // 攻撃範囲なし
+                break;
         }
     }
 
 
-    public void ClearDestination()
-    {
-        PlannedDestination = null;
-    }
 
     public List<Vector2Int> GetAttackablePositions(Vector2Int currentPos)
     {
         List<Vector2Int> result = new List<Vector2Int>();
 
-        foreach (var offset in AttackPattern)
+        foreach (var offset in AttackCells)
         {
             Vector2Int targetPos = currentPos + offset;
             result.Add(targetPos);
@@ -138,7 +175,7 @@ public class Unit : MonoBehaviour
     {
         List<Vector2Int> result = new List<Vector2Int>();
 
-        foreach (var offset in MovePattern)
+        foreach (var offset in MoveCells)
         {
             Vector2Int targetPos = currentPos + offset;
             if (targetPos.y >= GridManager.Rows || targetPos.x >= GridManager.Cols || targetPos.y < 0 || targetPos.x < 0) continue;
@@ -169,9 +206,6 @@ public class Unit : MonoBehaviour
 
             GridManager.Instance.SelectUnit(this);
         }
-
-
-
 
     }
 }

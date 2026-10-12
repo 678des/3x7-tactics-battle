@@ -12,6 +12,8 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     [Header("UI Panels")]
+
+    [SerializeField] private GameObject _mainGamePanel;
     [SerializeField] private GameObject _resultPanel; // リザルト画面全体のUIパネル
     [SerializeField] private TextMeshProUGUI _resultText;
 
@@ -26,6 +28,7 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        _mainGamePanel.SetActive(true);
         _resultPanel.SetActive(false);
     }
 
@@ -74,6 +77,7 @@ public class UIManager : MonoBehaviour
         PhaseEndButtonDisplay(false);
         if (_resultPanel != null)
         {
+            _mainGamePanel.SetActive(false);
             _resultPanel.SetActive(true);
         }
 

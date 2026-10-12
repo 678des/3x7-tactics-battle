@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 2921310223660412836}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 1, y: -0.5, z: 1}
+  m_LocalPosition: {x: 1.2, y: 0, z: 0.5}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -136,11 +136,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f701141dbf4b3244d864fa79f92e2ca9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
-  element: 1
-  power: 10
-  _unitMesh: {fileID: 0}
+  element: 0
+  power: 0
+  moveType: 4
+  attackCellType: 4
   IsPlayerOwned: 1
-  MovePattern:
+  MoveCells:
   - {x: 0, y: 1}
   - {x: 0, y: -1}
   - {x: 1, y: 0}
@@ -149,8 +150,8 @@ MonoBehaviour:
   - {x: -1, y: 1}
   - {x: 1, y: -1}
   - {x: -1, y: -1}
+  AttackCells:
   - {x: 0, y: 0}
-  AttackPattern:
   - {x: 0, y: 1}
   - {x: 0, y: -1}
   - {x: 1, y: 0}
@@ -159,8 +160,6 @@ MonoBehaviour:
   - {x: -1, y: 1}
   - {x: 1, y: -1}
   - {x: -1, y: -1}
-  _defaultMaterial: {fileID: 2100000, guid: f217f42a005fb5146a42c59b487b3443, type: 2}
-  _selectedMaterial: {fileID: 2100000, guid: f217f42a005fb5146a42c59b487b3443, type: 2}
 --- !u!65 &8038637596688340192
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -180,5 +179,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.2, y: 0.8, z: 0.4}
+  m_Center: {x: 0, y: 0, z: 0.3}

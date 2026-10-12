@@ -110,8 +110,8 @@ public class GameManager : MonoBehaviour
     /// <param name="isPlayerWin">プレイヤーが勝ったか</param>
     private IEnumerator HandleGameEndRoutine(bool isPlayerWin)
     {
-        // 1秒間しっかり余韻（演出やヒットストップ、エフェクトの残り時間）を待つ
-        yield return new WaitForSeconds(2.0f);
+        // 0秒間しっかり余韻（演出やヒットストップ、エフェクトの残り時間）を待つ
+        yield return new WaitForSeconds(0f);
 
         // UIManager経由でリザルト画面を表示する
         if (UIManager.Instance != null)
@@ -158,7 +158,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void ExecuteBattle()
     {
-        Debug.Log("バトル実行");
+
         battleProcessor.ExecuteBattle();
         StartPhase(GamePhase.Spawn);
     }

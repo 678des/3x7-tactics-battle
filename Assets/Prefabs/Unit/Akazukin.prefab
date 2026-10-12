@@ -105,10 +105,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   element: 0
-  power: 10
-  _unitMesh: {fileID: 0}
+  power: 2
+  moveType: 3
+  attackCellType: 3
   IsPlayerOwned: 1
-  MovePattern:
+  MoveCells:
   - {x: 0, y: 1}
   - {x: 0, y: -1}
   - {x: 1, y: 0}
@@ -117,7 +118,8 @@ MonoBehaviour:
   - {x: -1, y: 1}
   - {x: 1, y: -1}
   - {x: -1, y: -1}
-  AttackPattern:
+  AttackCells:
+  - {x: 0, y: 0}
   - {x: 0, y: 1}
   - {x: 0, y: -1}
   - {x: 1, y: 0}
@@ -126,8 +128,6 @@ MonoBehaviour:
   - {x: -1, y: 1}
   - {x: 1, y: -1}
   - {x: -1, y: -1}
-  _defaultMaterial: {fileID: 2100000, guid: b25fc8aa64e74184c8f56e1dd45bbca9, type: 2}
-  _selectedMaterial: {fileID: 2100000, guid: b25fc8aa64e74184c8f56e1dd45bbca9, type: 2}
 --- !u!65 &2139454351827330147
 BoxCollider:
   m_ObjectHideFlags: 0

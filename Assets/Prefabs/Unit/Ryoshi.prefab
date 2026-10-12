@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7900411526090058934}
   - component: {fileID: 5091736185789910127}
+  - component: {fileID: 5699503810227480603}
   m_Layer: 0
   m_Name: Ryoshi
   m_TagString: Untagged
@@ -45,11 +46,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f701141dbf4b3244d864fa79f92e2ca9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
-  element: 0
-  power: 10
-  _unitMesh: {fileID: 5975542981868009261}
+  element: 2
+  power: 1
+  moveType: 0
+  attackCellType: 0
   IsPlayerOwned: 1
-  MovePattern:
+  MoveCells:
+  - {x: 0, y: 1}
+  - {x: 0, y: -1}
+  - {x: 1, y: 0}
+  - {x: -1, y: 0}
+  - {x: 1, y: 1}
+  - {x: -1, y: 1}
+  - {x: 1, y: -1}
+  - {x: -1, y: -1}
+  AttackCells:
   - {x: 0, y: 0}
   - {x: 0, y: 1}
   - {x: 0, y: -1}
@@ -59,18 +70,27 @@ MonoBehaviour:
   - {x: -1, y: 1}
   - {x: 1, y: -1}
   - {x: -1, y: -1}
-  AttackPattern:
-  - {x: 0, y: 0}
-  - {x: 0, y: 1}
-  - {x: 0, y: -1}
-  - {x: 1, y: 0}
-  - {x: -1, y: 0}
-  - {x: 1, y: 1}
-  - {x: -1, y: 1}
-  - {x: 1, y: -1}
-  - {x: -1, y: -1}
-  _defaultMaterial: {fileID: 0}
-  _selectedMaterial: {fileID: 0}
+--- !u!65 &5699503810227480603
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4057958304938924769}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.5, y: 0.5, z: 1.5}
+  m_Center: {x: 0, y: 0.15, z: 0.8}
 --- !u!1 &8042261047206018548
 GameObject:
   m_ObjectHideFlags: 0
@@ -82,7 +102,6 @@ GameObject:
   - component: {fileID: 6548384935445227728}
   - component: {fileID: 5975542981868009261}
   - component: {fileID: 4140959784658499469}
-  - component: {fileID: 3614854143715342946}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -162,24 +181,3 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8042261047206018548}
   m_Mesh: {fileID: 8005435744356657715, guid: e7e4016b5fd0bfc44a74dfcc3c1ce181, type: 3}
---- !u!65 &3614854143715342946
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8042261047206018548}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3.3741815, y: 6.8768787, z: 2.979017}
-  m_Center: {x: 0, y: -0.80265754, z: -0.8063151}
